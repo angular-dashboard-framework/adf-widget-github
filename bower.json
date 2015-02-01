@@ -1,0 +1,19 @@
+{
+  "name": "adf-widget-github",
+  "version": "0.1.0-SNAPSHOT",
+  "main": "dist/adf-widget-github.js",
+  "ignore": [
+    "bower.json",
+    ".bowerrc",
+    ".jshintrc",
+    ".gitignore",
+    "gulpfile.js",
+    "node_modules",
+    "package.json",
+    "src"
+  ],
+  "dependencies": {
+    "highcharts-ng": "0.0.6",
+    "highcharts": "4.0.3"
+  }
+}
