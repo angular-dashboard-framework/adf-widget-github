@@ -1,6 +1,6 @@
 {
   "name": "adf-widget-github",
-  "version": "0.1.0-SNAPSHOT",
+  "version": "0.1.0",
   "main": "dist/adf-widget-github.js",
   "ignore": [
     "bower.json",
@@ -10,10 +10,15 @@
     "gulpfile.js",
     "node_modules",
     "package.json",
+    "components",
     "src"
   ],
   "dependencies": {
+    "angular-dashboard-framework": "0.7.0",
     "highcharts-ng": "0.0.6",
     "highcharts": "4.0.3"
+  },
+  "devDependencies": {
+    "angular-local-storage": "0.1.5"
   }
 }

@@ -24,36 +24,27 @@
 
 'use strict';
 
-angular.module('adf.widget.github', ['adf.provider', 'highcharts-ng'])
-  .value('githubApiUrl', 'https://api.github.com/repos/')
-  .config(function(dashboardProvider){
-    // template object for github widgets
-    var widget = {
-      templateUrl: '{widgetsPath}/github/src/view.html',
-      reload: true,
-      resolve: {
-        commits: ["githubService", "config", function(githubService, config){
-          if (config.path){
-            return githubService.get(config.path);
-          }
-        }]
-      },
-      edit: {
-        templateUrl: '{widgetsPath}/github/src/edit.html'
+angular.module('adf.widget.github')
+  .service('githubService', function($q, $http, githubApiUrl){
+    return {
+      get: function(path){
+        var deferred = $q.defer();
+        var url = githubApiUrl + path + '/commits?callback=JSON_CALLBACK';
+        $http.jsonp(url)
+          .success(function(data){
+            if (data && data.meta){
+              var status = data.meta.status;
+              if ( status < 300 ){
+                deferred.resolve(data.data);
+              } else {
+                deferred.reject(data.data.message);
+              }
+            }
+          })
+          .error(function(){
+            deferred.reject();
+          });
+        return deferred.promise;
       }
     };
-
-    // register github template by extending the template object
-    dashboardProvider
-      .widget('githubHistory', angular.extend({
-        title: 'Github History',
-        description: 'Display the commit history of a GitHub project as chart',
-        controller: 'githubHistoryCtrl'
-        }, widget))
-      .widget('githubAuthor', angular.extend({
-        title: 'Github Author',
-        description: 'Displays the commits per author as pie chart',
-        controller: 'githubAuthorCtrl'
-        }, widget));
-
   });

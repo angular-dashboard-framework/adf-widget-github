@@ -24,36 +24,56 @@
 
 'use strict';
 
-angular.module('adf.widget.github', ['adf.provider', 'highcharts-ng'])
-  .value('githubApiUrl', 'https://api.github.com/repos/')
-  .config(function(dashboardProvider){
-    // template object for github widgets
-    var widget = {
-      templateUrl: '{widgetsPath}/github/src/view.html',
-      reload: true,
-      resolve: {
-        commits: ["githubService", "config", function(githubService, config){
-          if (config.path){
-            return githubService.get(config.path);
-          }
-        }]
-      },
-      edit: {
-        templateUrl: '{widgetsPath}/github/src/edit.html'
-      }
-    };
+angular.module('adf.widget.github')
+  .controller('githubHistoryCtrl', function($scope, config, commits){
 
-    // register github template by extending the template object
-    dashboardProvider
-      .widget('githubHistory', angular.extend({
-        title: 'Github History',
-        description: 'Display the commit history of a GitHub project as chart',
-        controller: 'githubHistoryCtrl'
-        }, widget))
-      .widget('githubAuthor', angular.extend({
-        title: 'Github Author',
-        description: 'Displays the commits per author as pie chart',
-        controller: 'githubAuthorCtrl'
-        }, widget));
+    function parseDate(input) {
+      var parts = input.split('-');
+      return Date.UTC(parts[0], parts[1]-1, parts[2]);
+    }
+
+    var data = {};
+    angular.forEach(commits, function(commit){
+      var day = commit.commit.author.date;
+      day = day.substring(0, day.indexOf('T'));
+
+      if (data[day]){
+        data[day]++;
+      } else {
+        data[day] = 1;
+      }
+    });
+
+    var seriesData = [];
+    angular.forEach(data, function(count, day){
+      seriesData.push([parseDate(day), count]);
+    });
+    seriesData.sort(function(a, b){
+      return a[0] - b[0];
+    });
+
+    if ( commits ){
+      $scope.chartConfig = {
+        chart: {
+          type: 'spline'
+        },
+        title: {
+          text: 'Github commit history'
+        },
+        xAxis: {
+          type: 'datetime'
+        },
+        yAxis: {
+          title: {
+            text: 'Commits'
+          },
+          min: 0
+        },
+        series: [{
+          name: config.path,
+          data: seriesData
+        }]
+      };
+    }
 
   });
