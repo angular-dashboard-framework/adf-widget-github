@@ -27,7 +27,7 @@
 angular.module('adf.widget.github')
   .service('githubService', function($q, $http, githubApiUrl){
     return {
-      get: function(path){
+      getCommits: function(path){
         var deferred = $q.defer();
         var url = githubApiUrl + path + '/commits?callback=JSON_CALLBACK';
         $http.jsonp(url)

@@ -32,11 +32,12 @@ angular.module('adf.widget.github', ['adf.provider', 'highcharts-ng'])
       templateUrl: '{widgetsPath}/github/src/view.html',
       reload: true,
       resolve: {
-        commits: ["githubService", "config", function(githubService, config){
+        /* @ngInject */
+        commits: function(githubService, config){
           if (config.path){
-            return githubService.get(config.path);
+            return githubService.getCommits(config.path);
           }
-        }]
+        }
       },
       edit: {
         templateUrl: '{widgetsPath}/github/src/edit.html'
