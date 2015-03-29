@@ -13,6 +13,13 @@
     "components",
     "src"
   ],
+  "keywords": [
+    "dashboard",
+    "widget",
+    "adf",
+    "adf-widget"
+  ],
+  "description": "Github widgets for the angular-dashboard-framework",
   "dependencies": {
     "angular-dashboard-framework": "0.7.0",
     "highcharts-ng": "0.0.6",
