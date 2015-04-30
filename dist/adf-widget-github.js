@@ -1,3 +1,4 @@
+(function(window, undefined) {'use strict';
 /*
  * The MIT License
  *
@@ -22,22 +23,22 @@
  * SOFTWARE.
  */
 
-'use strict';
+
 
 angular.module('adf.widget.github', ['adf.provider', 'highcharts-ng'])
   .value('githubApiUrl', 'https://api.github.com/repos/')
-  .config(function(dashboardProvider){
+  .config(["dashboardProvider", function(dashboardProvider){
     // template object for github widgets
     var widget = {
       templateUrl: '{widgetsPath}/github/src/view.html',
       reload: true,
       resolve: {
         /* @ngInject */
-        commits: function(githubService, config){
+        commits: ["githubService", "config", function(githubService, config){
           if (config.path){
             return githubService.getCommits(config.path);
           }
-        }
+        }]
       },
       edit: {
         templateUrl: '{widgetsPath}/github/src/edit.html'
@@ -57,7 +58,7 @@ angular.module('adf.widget.github', ['adf.provider', 'highcharts-ng'])
         controller: 'githubAuthorCtrl'
         }, widget));
 
-  });
+  }]);
 
 angular.module("adf.widget.github").run(["$templateCache", function($templateCache) {$templateCache.put("{widgetsPath}/github/src/edit.html","<form role=form><div class=form-group><label for=path>Github Repository Path</label> <input type=text class=form-control id=path ng-model=config.path placeholder=\"Enter Path (username/reponame)\"></div></form>");
 $templateCache.put("{widgetsPath}/github/src/view.html","<div><div class=\"alert alert-info\" ng-if=!chartConfig>Please insert a repository path in the widget configuration</div><div ng-if=chartConfig><highchart id=chart1 config=chartConfig></highchart></div></div>");}]);
@@ -85,10 +86,10 @@ $templateCache.put("{widgetsPath}/github/src/view.html","<div><div class=\"alert
  * SOFTWARE.
  */
 
-'use strict';
+
 
 angular.module('adf.widget.github')
-  .service('githubService', function($q, $http, githubApiUrl){
+  .service('githubService', ["$q", "$http", "githubApiUrl", function($q, $http, githubApiUrl){
     return {
       getCommits: function(path){
         var deferred = $q.defer();
@@ -110,7 +111,7 @@ angular.module('adf.widget.github')
         return deferred.promise;
       }
     };
-  });
+  }]);
 
 /*
  * The MIT License
@@ -136,10 +137,10 @@ angular.module('adf.widget.github')
  * SOFTWARE.
  */
 
-'use strict';
+
 
 angular.module('adf.widget.github')
-  .controller('githubHistoryCtrl', function($scope, config, commits){
+  .controller('githubHistoryCtrl', ["$scope", "config", "commits", function($scope, config, commits){
 
     function parseDate(input) {
       var parts = input.split('-');
@@ -190,7 +191,7 @@ angular.module('adf.widget.github')
       };
     }
 
-  });
+  }]);
 
 /*
  * The MIT License
@@ -216,10 +217,10 @@ angular.module('adf.widget.github')
  * SOFTWARE.
  */
 
-'use strict';
+
 
 angular.module('adf.widget.github')
-  .controller('githubAuthorCtrl', function($scope, config, commits){
+  .controller('githubAuthorCtrl', ["$scope", "config", "commits", function($scope, config, commits){
 
     var data = {};
     angular.forEach(commits, function(commit){
@@ -278,4 +279,5 @@ angular.module('adf.widget.github')
       };
     }
 
-  });
+  }]);
+})(window);
