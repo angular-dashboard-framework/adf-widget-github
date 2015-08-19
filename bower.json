@@ -1,6 +1,6 @@
 {
   "name": "adf-widget-github",
-  "version": "0.1.3",
+  "version": "0.1.4",
   "main": "dist/adf-widget-github.js",
   "ignore": [
     "bower.json",
