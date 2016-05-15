@@ -31,6 +31,7 @@ angular.module('adf.widget.github', ['adf.provider', 'highcharts-ng'])
     var widget = {
       templateUrl: '{widgetsPath}/github/src/view.html',
       reload: true,
+      category: 'GitHub',
       resolve: {
         /* @ngInject */
         commits: function(githubService, config){
