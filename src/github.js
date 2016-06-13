@@ -41,7 +41,6 @@ function RegisterWidgets(dashboardProvider) {
   };
 
   var commitWidgets = angular.extend({
-    templateUrl: '{widgetsPath}/github/src/view.html',
     resolve: {
       /* @ngInject */
       commits: function (github, config) {
@@ -57,12 +56,20 @@ function RegisterWidgets(dashboardProvider) {
     .widget('githubHistory', angular.extend({
       title: 'Github History',
       description: 'Display the commit history of a GitHub project as chart',
-      controller: 'GithubHistoryController'
+      controller: 'GithubHistoryController',
+      templateUrl: '{widgetsPath}/github/src/view.html'
     }, commitWidgets))
     .widget('githubAuthor', angular.extend({
       title: 'Github Author',
       description: 'Displays the commits per author as pie chart',
-      controller: 'GithubAuthorController'
+      controller: 'GithubAuthorController',
+      templateUrl: '{widgetsPath}/github/src/view.html'
+    }, commitWidgets))
+    .widget('githubCommits', angular.extend({
+      title: 'Github Commits',
+      description: 'Displays the commits as list',
+      controller: 'GithubCommitsController',
+      templateUrl: '{widgetsPath}/github/src/commits.html'
     }, commitWidgets))
     .widget('githubIssues', angular.extend({
       title: 'Github Issues',
@@ -76,5 +83,5 @@ function RegisterWidgets(dashboardProvider) {
           }
         }
       }
-    }, widget));;
+    }, widget));
 }
