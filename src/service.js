@@ -24,27 +24,36 @@
 
 'use strict';
 
-angular.module('adf.widget.github')
-  .service('githubService', function($q, $http, githubApiUrl){
-    return {
-      getCommits: function(path){
-        var deferred = $q.defer();
-        var url = githubApiUrl + path + '/commits?callback=JSON_CALLBACK';
-        $http.jsonp(url)
-          .success(function(data){
-            if (data && data.meta){
-              var status = data.meta.status;
-              if ( status < 300 ){
-                deferred.resolve(data.data);
-              } else {
-                deferred.reject(data.data.message);
-              }
-            }
-          })
-          .error(function(){
-            deferred.reject();
-          });
-        return deferred.promise;
-      }
-    };
-  });
+angular
+  .module('adf.widget.github')
+  .factory('github', GithubService);
+
+function GithubService($q, $http, githubApiUrl) {
+  var service = {
+    getCommits: getCommits
+  };
+
+  return service;
+
+  // implementation
+
+  function getCommits(path) {
+    var deferred = $q.defer();
+    var url = githubApiUrl + path + '/commits?callback=JSON_CALLBACK';
+    $http.jsonp(url)
+      .success(function(data) {
+        if (data && data.meta) {
+          var status = data.meta.status;
+          if (status < 300) {
+            deferred.resolve(data.data);
+          } else {
+            deferred.reject(data.data.message);
+          }
+        }
+      })
+      .error(function() {
+        deferred.reject();
+      });
+    return deferred.promise;
+  };
+}

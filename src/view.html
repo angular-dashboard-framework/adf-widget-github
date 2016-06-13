@@ -1,8 +1,8 @@
 <div>
-  <div class="alert alert-info" ng-if="!chartConfig">
+  <div class="alert alert-info" ng-if="!vm.chartConfig">
     Please insert a repository path in the widget configuration
   </div>
-  <div ng-if="chartConfig">
-    <highchart id="chart1" config="chartConfig"></highchart>
+  <div ng-if="vm.chartConfig">
+    <highchart id="chart1" config="vm.chartConfig"></highchart>
   </div>
 </div>
