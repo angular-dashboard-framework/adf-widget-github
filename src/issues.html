@@ -6,20 +6,22 @@
     <ul class="media-list">
       <li class="media" ng-repeat="issue in vm.issues">
         <div class="media-left">
-          <img class="media-object img-thumbnail"
-               ng-src="{{issue.user.avatar_url}}"
-               style="width: 64px; height: 64px;"
-               alt="">
+          <a href="{{issue.user.html_url}}" target="_blank">
+            <img class="media-object img-thumbnail"
+                ng-src="{{issue.user.avatar_url}}"
+                style="width: 64px; height: 64px;"
+                alt="">
+          </a>
         </div>
         <div class="media-body">
           <h4 class="media-heading">
             <a href="{{issue.html_url}}" target="_blank">
-              {{issue.number}} {{issue.title}}
+              #{{issue.number}} {{issue.title}}
             </a>
           </h4>
           <p>{{issue.body | limitTo: 128}}</p>
           <small>
-            <a href="{{issue.user.html_url}}">{{issue.user.login}}</a>,
+            <a href="{{issue.user.html_url}}" target="_blank">{{issue.user.login}}</a>,
             {{issue.created_at | date: 'yyyy-MM-dd HH:mm'}}
           </small>
         </div>

@@ -6,10 +6,12 @@
     <ul class="media-list">
       <li class="media" ng-repeat="commit in vm.commits">
         <div class="media-left">
-          <img class="media-object img-thumbnail"
-               ng-src="{{commit.author.avatar_url}}"
-               style="width: 64px; height: 64px;"
-               alt="">
+          <a href="{{commit.author.html_url}}" target="_blank">
+            <img class="media-object img-thumbnail"
+                ng-src="{{commit.author.avatar_url}}"
+                style="width: 64px; height: 64px;"
+                alt="">
+          </a>
         </div>
         <div class="media-body">
           <h4 class="media-heading">
@@ -19,7 +21,7 @@
           </h4>
           <p>{{commit.commit.message | limitTo: 128}}</p>
           <small>
-            <a href="{{commit.author.html_url}}">{{commit.commit.author.name}}</a>,
+            <a href="{{commit.author.html_url}}" target="_blank">{{commit.commit.author.name}}</a>,
             {{commit.commit.author.date | date: 'yyyy-MM-dd HH:mm'}}
           </small>
         </div>
