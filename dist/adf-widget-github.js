@@ -42,7 +42,6 @@ function RegisterWidgets(dashboardProvider) {
   };
 
   var commitWidgets = angular.extend({
-    templateUrl: '{widgetsPath}/github/src/view.html',
     resolve: {
       /* @ngInject */
       commits: ["github", "config", function (github, config) {
@@ -58,12 +57,20 @@ function RegisterWidgets(dashboardProvider) {
     .widget('githubHistory', angular.extend({
       title: 'Github History',
       description: 'Display the commit history of a GitHub project as chart',
-      controller: 'GithubHistoryController'
+      controller: 'GithubHistoryController',
+      templateUrl: '{widgetsPath}/github/src/view.html'
     }, commitWidgets))
     .widget('githubAuthor', angular.extend({
       title: 'Github Author',
       description: 'Displays the commits per author as pie chart',
-      controller: 'GithubAuthorController'
+      controller: 'GithubAuthorController',
+      templateUrl: '{widgetsPath}/github/src/view.html'
+    }, commitWidgets))
+    .widget('githubCommits', angular.extend({
+      title: 'Github Commits',
+      description: 'Displays the commits as list',
+      controller: 'GithubCommitsController',
+      templateUrl: '{widgetsPath}/github/src/commits.html'
     }, commitWidgets))
     .widget('githubIssues', angular.extend({
       title: 'Github Issues',
@@ -77,12 +84,13 @@ function RegisterWidgets(dashboardProvider) {
           }
         }
       }
-    }, widget));;
+    }, widget));
 }
 RegisterWidgets.$inject = ["dashboardProvider"];
 
-angular.module("adf.widget.github").run(["$templateCache", function($templateCache) {$templateCache.put("{widgetsPath}/github/src/edit.html","<form role=form><div class=form-group><label for=path>Github Repository Path</label> <input type=text class=form-control id=path ng-model=config.path placeholder=\"Enter Path (username/reponame)\"></div><div class=form-group><label for=path>Access Token</label> <input type=text class=form-control id=path ng-model=config.accessToken></div></form>");
-$templateCache.put("{widgetsPath}/github/src/issues.html","<div><div ng-if=!config.path class=\"alert alert-info\">Please configure the widget</div><div ng-if=config.path><ul class=media-list><li class=media ng-repeat=\"issue in vm.issues\"><div class=media-left><img class=\"media-object img-thumbnail\" ng-src={{issue.user.avatar_url}} style=\"width: 64px; height: 64px;\"></div><div class=media-body><h4 class=media-heading><a href={{issue.html_url}} target=_blank>{{issue.number}} {{issue.title}}</a></h4><p>{{issue.body | limitTo: 128}}</p><small><a href={{issue.user.html_url}}>{{issue.user.login}}</a>, {{issue.created_at | date: \'yyyy-MM-dd HH:mm\'}}</small></div></li></ul></div></div>");
+angular.module("adf.widget.github").run(["$templateCache", function($templateCache) {$templateCache.put("{widgetsPath}/github/src/commits.html","<div><div ng-if=!vm.commits class=\"alert alert-info\">Please configure the widget</div><div ng-if=config.path><ul class=media-list><li class=media ng-repeat=\"commit in vm.commits\"><div class=media-left><a href={{commit.author.html_url}} target=_blank><img class=\"media-object img-thumbnail\" ng-src={{commit.author.avatar_url}} style=\"width: 64px; height: 64px;\"></a></div><div class=media-body><h4 class=media-heading><a href={{commit.html_url}} target=_blank>{{commit.sha | limitTo: 12}}</a></h4><p>{{commit.commit.message | limitTo: 128}}</p><small><a href={{commit.author.html_url}} target=_blank>{{commit.commit.author.name}}</a>, {{commit.commit.author.date | date: \'yyyy-MM-dd HH:mm\'}}</small></div></li></ul></div></div>");
+$templateCache.put("{widgetsPath}/github/src/edit.html","<form role=form><div class=form-group><label for=path>Github Repository Path</label> <input type=text class=form-control id=path ng-model=config.path placeholder=\"Enter Path (username/reponame)\"></div><div class=form-group><label for=path>Access Token</label> <input type=text class=form-control id=path ng-model=config.accessToken></div></form>");
+$templateCache.put("{widgetsPath}/github/src/issues.html","<div><div ng-if=!config.path class=\"alert alert-info\">Please configure the widget</div><div ng-if=config.path><ul class=media-list><li class=media ng-repeat=\"issue in vm.issues\"><div class=media-left><a href={{issue.user.html_url}} target=_blank><img class=\"media-object img-thumbnail\" ng-src={{issue.user.avatar_url}} style=\"width: 64px; height: 64px;\"></a></div><div class=media-body><h4 class=media-heading><a href={{issue.html_url}} target=_blank>#{{issue.number}} {{issue.title}}</a></h4><p>{{issue.body | limitTo: 128}}</p><small><a href={{issue.user.html_url}} target=_blank>{{issue.user.login}}</a>, {{issue.created_at | date: \'yyyy-MM-dd HH:mm\'}}</small></div></li></ul></div></div>");
 $templateCache.put("{widgetsPath}/github/src/view.html","<div><div class=\"alert alert-info\" ng-if=!vm.chartConfig>Please insert a repository path in the widget configuration</div><div ng-if=vm.chartConfig><highchart id=chart1 config=vm.chartConfig></highchart></div></div>");}]);
 /*
  * The MIT License
@@ -282,6 +290,43 @@ function GithubHistoryController(config, commits) {
 
 }
 GithubHistoryController.$inject = ["config", "commits"];
+
+/*
+ * The MIT License
+ *
+ * Copyright (c) 2015, Sebastian Sdorra
+ *
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ *
+ * The above copyright notice and this permission notice shall be included in
+ * all copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+ * SOFTWARE.
+ */
+
+
+
+angular
+  .module('adf.widget.github')
+  .controller('GithubCommitsController', GithubCommitsController);
+
+function GithubCommitsController(config, commits) {
+  var vm = this;
+
+  vm.commits = commits;
+}
+GithubCommitsController.$inject = ["config", "commits"];
 
 /*
  * The MIT License
