@@ -32,22 +32,25 @@ angular
 function RegisterWidgets(dashboardProvider) {
   // template object for github widgets
   var widget = {
-    templateUrl: '{widgetsPath}/github/src/view.html',
     reload: true,
     category: 'GitHub',
     controllerAs: 'vm',
-    resolve: {
-      /* @ngInject */
-      commits: function (github, config) {
-        if (config.path) {
-          return github.getCommits(config.path);
-        }
-      }
-    },
     edit: {
       templateUrl: '{widgetsPath}/github/src/edit.html'
     }
   };
+
+  var commitWidgets = angular.extend({
+    templateUrl: '{widgetsPath}/github/src/view.html',
+    resolve: {
+      /* @ngInject */
+      commits: function (github, config) {
+        if (config.path) {
+          return github.getCommits(config);
+        }
+      }
+    }
+  }, widget);
 
   // register github template by extending the template object
   dashboardProvider
@@ -55,10 +58,23 @@ function RegisterWidgets(dashboardProvider) {
       title: 'Github History',
       description: 'Display the commit history of a GitHub project as chart',
       controller: 'GithubHistoryController'
-    }, widget))
+    }, commitWidgets))
     .widget('githubAuthor', angular.extend({
       title: 'Github Author',
       description: 'Displays the commits per author as pie chart',
       controller: 'GithubAuthorController'
-    }, widget));
+    }, commitWidgets))
+    .widget('githubIssues', angular.extend({
+      title: 'Github Issues',
+      description: 'Displays issues as list of a GitHub project',
+      controller: 'GithubIssuesController',
+      templateUrl: '{widgetsPath}/github/src/issues.html',
+      resolve: {
+        issues: function(github, config){
+          if (config.path){
+            return github.getIssues(config);
+          }
+        }
+      }
+    }, widget));;
 }

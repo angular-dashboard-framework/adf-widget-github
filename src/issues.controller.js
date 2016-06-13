@@ -26,50 +26,10 @@
 
 angular
   .module('adf.widget.github')
-  .factory('github', GithubService);
+  .controller('GithubIssuesController', GithubIssuesController);
 
-function GithubService($q, $http, githubApiUrl) {
-  var service = {
-    getCommits: getCommits,
-    getIssues: getIssues
-  };
+function GithubIssuesController(config, issues) {
+  var vm = this;
 
-  return service;
-
-  // implementation
-
-  function getIssues(config) {
-    return fetch(createUrl('issues', config));
-  }
-
-  function getCommits(config) {
-    return fetch(createUrl('commits', config));
-  }
-
-  function createUrl(type, config){
-    var url = githubApiUrl + config.path + '/' + type + '?callback=JSON_CALLBACK';
-    if (config.accessToken){
-      url += '&access_token=' + config.accessToken;
-    }
-    return url;
-  }
-
-  function fetch(url){
-    var deferred = $q.defer();
-    $http.jsonp(url)
-      .success(function(data) {
-        if (data && data.meta) {
-          var status = data.meta.status;
-          if (status < 300) {
-            deferred.resolve(data.data);
-          } else {
-            deferred.reject(data.data.message);
-          }
-        }
-      })
-      .error(function() {
-        deferred.reject();
-      });
-    return deferred.promise;
-  }
+  vm.issues = issues;
 }
