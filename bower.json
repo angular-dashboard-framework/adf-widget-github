@@ -23,8 +23,7 @@
   "description": "Github widgets for the angular-dashboard-framework",
   "dependencies": {
     "angular-dashboard-framework": "~0.11.0",
-    "highcharts-ng": "0.0.6",
-    "highcharts": "4.0.3"
+    "angular-chart.js": "^0.10.2"
   },
   "devDependencies": {
     "angular-local-storage": "0.1.5"
@@ -36,7 +35,7 @@
     "Sortable": "^1.2.1"
   },
   "overrides": {
-    "bootstrap" : {
+    "bootstrap": {
       "main": [
         "dist/css/bootstrap.css"
       ]

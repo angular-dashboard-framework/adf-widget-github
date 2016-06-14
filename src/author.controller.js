@@ -31,61 +31,33 @@ angular
 function GithubAuthorController(config, commits) {
   var vm = this;
 
-  var data = {};
-  angular.forEach(commits, function (commit) {
-    var author = commit.commit.author.name;
-    if (data[author]) {
-      data[author]++;
-    } else {
-      data[author] = 1;
-    }
-  });
-
-  var seriesData = [];
-  angular.forEach(data, function (count, author) {
-    seriesData.push([author, count]);
-  });
-  if (seriesData.length > 0) {
-    seriesData.sort(function (a, b) {
-      return b[1] - a[1];
-    });
-    var s = seriesData[0];
-    seriesData[0] = {
-      name: s[0],
-      y: s[1],
-      sliced: true,
-      selected: true
-    };
-  }
-
   if (commits) {
-    vm.chartConfig = {
-      chart: {
-        plotBackgroundColor: null,
-        plotBorderWidth: null,
-        plotShadow: false
-      },
-      title: {
-        text: config.path
-      },
-      plotOptions: {
-        pie: {
-          allowPointSelect: true,
-          cursor: 'pointer',
-          dataLabels: {
-            enabled: true,
-            color: '#000000',
-            connectorColor: '#000000',
-            format: '<b>{point.name}</b>: {point.percentage:.1f} %'
-          }
-        }
-      },
-      series: [{
-        type: 'pie',
-        name: config.path,
-        data: seriesData
-      }]
-    };
+    vm.chart = createChart();
   }
 
+  function createChart() {
+    var data = {};
+    angular.forEach(commits, function (commit) {
+      var author = commit.commit.author.name;
+      if (data[author]) {
+        data[author]++;
+      } else {
+        data[author] = 1;
+      }
+    });
+
+    var chart = {
+      labels: [],
+      data: [],
+      series: ["Commits"],
+      class: "chart-pie"
+    };
+
+    angular.forEach(data, function (count, author) {
+      chart.labels.push(author);
+      chart.data.push(count);
+    });
+
+    return chart;
+  }
 }

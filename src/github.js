@@ -25,7 +25,7 @@
 'use strict';
 
 angular
-  .module('adf.widget.github', ['adf.provider', 'highcharts-ng'])
+  .module('adf.widget.github', ['adf.provider', 'chart.js'])
   .value('githubApiUrl', 'https://api.github.com/repos/')
   .config(RegisterWidgets);
 
@@ -57,13 +57,13 @@ function RegisterWidgets(dashboardProvider) {
       title: 'Github History',
       description: 'Display the commit history of a GitHub project as chart',
       controller: 'GithubHistoryController',
-      templateUrl: '{widgetsPath}/github/src/view.html'
+      templateUrl: '{widgetsPath}/github/src/line-chart.html'
     }, commitWidgets))
     .widget('githubAuthor', angular.extend({
       title: 'Github Author',
       description: 'Displays the commits per author as pie chart',
       controller: 'GithubAuthorController',
-      templateUrl: '{widgetsPath}/github/src/view.html'
+      templateUrl: '{widgetsPath}/github/src/pie-chart.html'
     }, commitWidgets))
     .widget('githubCommits', angular.extend({
       title: 'Github Commits',

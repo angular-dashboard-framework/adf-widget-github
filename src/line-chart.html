@@ -1,0 +1,11 @@
+<div>
+  <div class="alert alert-info" ng-if="!vm.chart">
+    Please insert a repository path in the widget configuration
+  </div>
+  <div ng-if="vm.chart">
+    <canvas id="line" class="chart chart-line"
+            chart-data="vm.chart.data" chart-labels="vm.chart.labels"
+            chart-series="vm.chart.series">
+    </canvas>
+  </div>
+</div>
