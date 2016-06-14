@@ -26,7 +26,7 @@
 
 
 angular
-  .module('adf.widget.github', ['adf.provider', 'highcharts-ng'])
+  .module('adf.widget.github', ['adf.provider', 'chart.js'])
   .value('githubApiUrl', 'https://api.github.com/repos/')
   .config(RegisterWidgets);
 
@@ -58,13 +58,13 @@ function RegisterWidgets(dashboardProvider) {
       title: 'Github History',
       description: 'Display the commit history of a GitHub project as chart',
       controller: 'GithubHistoryController',
-      templateUrl: '{widgetsPath}/github/src/view.html'
+      templateUrl: '{widgetsPath}/github/src/line-chart.html'
     }, commitWidgets))
     .widget('githubAuthor', angular.extend({
       title: 'Github Author',
       description: 'Displays the commits per author as pie chart',
       controller: 'GithubAuthorController',
-      templateUrl: '{widgetsPath}/github/src/view.html'
+      templateUrl: '{widgetsPath}/github/src/pie-chart.html'
     }, commitWidgets))
     .widget('githubCommits', angular.extend({
       title: 'Github Commits',
@@ -91,7 +91,8 @@ RegisterWidgets.$inject = ["dashboardProvider"];
 angular.module("adf.widget.github").run(["$templateCache", function($templateCache) {$templateCache.put("{widgetsPath}/github/src/commits.html","<div><div ng-if=!vm.commits class=\"alert alert-info\">Please configure the widget</div><div ng-if=config.path><ul class=media-list><li class=media ng-repeat=\"commit in vm.commits\"><div class=media-left><a href={{commit.author.html_url}} target=_blank><img class=\"media-object img-thumbnail\" ng-src={{commit.author.avatar_url}} style=\"width: 64px; height: 64px;\"></a></div><div class=media-body><h4 class=media-heading><a href={{commit.html_url}} target=_blank>{{commit.sha | limitTo: 12}}</a></h4><p>{{commit.commit.message | limitTo: 128}}</p><small><a href={{commit.author.html_url}} target=_blank>{{commit.commit.author.name}}</a>, {{commit.commit.author.date | date: \'yyyy-MM-dd HH:mm\'}}</small></div></li></ul></div></div>");
 $templateCache.put("{widgetsPath}/github/src/edit.html","<form role=form><div class=form-group><label for=path>Github Repository Path</label> <input type=text class=form-control id=path ng-model=config.path placeholder=\"Enter Path (username/reponame)\"></div><div class=form-group><label for=path>Access Token</label> <input type=text class=form-control id=path ng-model=config.accessToken></div></form>");
 $templateCache.put("{widgetsPath}/github/src/issues.html","<div><div ng-if=!config.path class=\"alert alert-info\">Please configure the widget</div><div ng-if=config.path><ul class=media-list><li class=media ng-repeat=\"issue in vm.issues\"><div class=media-left><a href={{issue.user.html_url}} target=_blank><img class=\"media-object img-thumbnail\" ng-src={{issue.user.avatar_url}} style=\"width: 64px; height: 64px;\"></a></div><div class=media-body><h4 class=media-heading><a href={{issue.html_url}} target=_blank>#{{issue.number}} {{issue.title}}</a></h4><p>{{issue.body | limitTo: 128}}</p><small><a href={{issue.user.html_url}} target=_blank>{{issue.user.login}}</a>, {{issue.created_at | date: \'yyyy-MM-dd HH:mm\'}}</small></div></li></ul></div></div>");
-$templateCache.put("{widgetsPath}/github/src/view.html","<div><div class=\"alert alert-info\" ng-if=!vm.chartConfig>Please insert a repository path in the widget configuration</div><div ng-if=vm.chartConfig><highchart id=chart1 config=vm.chartConfig></highchart></div></div>");}]);
+$templateCache.put("{widgetsPath}/github/src/line-chart.html","<div><div class=\"alert alert-info\" ng-if=!vm.chart>Please insert a repository path in the widget configuration</div><div ng-if=vm.chart><canvas id=line class=\"chart chart-line\" chart-data=vm.chart.data chart-labels=vm.chart.labels chart-series=vm.chart.series></canvas></div></div>");
+$templateCache.put("{widgetsPath}/github/src/pie-chart.html","<div><div class=\"alert alert-info\" ng-if=!vm.chart>Please insert a repository path in the widget configuration</div><div ng-if=vm.chart><canvas id=pie class=\"chart chart-pie\" chart-legend=true chart-data=vm.chart.data chart-labels=vm.chart.labels></canvas></div></div>");}]);
 /*
  * The MIT License
  *
@@ -238,56 +239,38 @@ angular
 
 function GithubHistoryController(config, commits) {
   var vm = this;
-
-  function parseDate(input) {
-    var parts = input.split('-');
-    return Date.UTC(parts[0], parts[1] - 1, parts[2]);
-  }
-
-  var data = {};
-  angular.forEach(commits, function (commit) {
-    var day = commit.commit.author.date;
-    day = day.substring(0, day.indexOf('T'));
-
-    if (data[day]) {
-      data[day]++;
-    } else {
-      data[day] = 1;
-    }
-  });
-
-  var seriesData = [];
-  angular.forEach(data, function (count, day) {
-    seriesData.push([parseDate(day), count]);
-  });
-  seriesData.sort(function (a, b) {
-    return a[0] - b[0];
-  });
-
   if (commits) {
-    vm.chartConfig = {
-      chart: {
-        type: 'spline'
-      },
-      title: {
-        text: 'Github commit history'
-      },
-      xAxis: {
-        type: 'datetime'
-      },
-      yAxis: {
-        title: {
-          text: 'Commits'
-        },
-        min: 0
-      },
-      series: [{
-        name: config.path,
-        data: seriesData
-      }]
-    };
+    vm.chart = createChart();
   }
 
+  function createChart() {
+    var data = {};
+    angular.forEach(commits, function (commit) {
+      var day = commit.commit.author.date;
+      day = day.substring(0, day.indexOf('T'));
+
+      if (data[day]) {
+        data[day]++;
+      } else {
+        data[day] = 1;
+      }
+    });
+
+    var chartData = [];
+    var chart = {
+      labels: [],
+      data: [chartData],
+      series: ["Commits"],
+      class: "chart-line"
+    };
+
+    angular.forEach(data, function (count, day) {
+      chart.labels.push(day);
+      chartData.push(count);
+    });
+
+    return chart;
+  }
 }
 GithubHistoryController.$inject = ["config", "commits"];
 
@@ -361,63 +344,35 @@ angular
 function GithubAuthorController(config, commits) {
   var vm = this;
 
-  var data = {};
-  angular.forEach(commits, function (commit) {
-    var author = commit.commit.author.name;
-    if (data[author]) {
-      data[author]++;
-    } else {
-      data[author] = 1;
-    }
-  });
-
-  var seriesData = [];
-  angular.forEach(data, function (count, author) {
-    seriesData.push([author, count]);
-  });
-  if (seriesData.length > 0) {
-    seriesData.sort(function (a, b) {
-      return b[1] - a[1];
-    });
-    var s = seriesData[0];
-    seriesData[0] = {
-      name: s[0],
-      y: s[1],
-      sliced: true,
-      selected: true
-    };
-  }
-
   if (commits) {
-    vm.chartConfig = {
-      chart: {
-        plotBackgroundColor: null,
-        plotBorderWidth: null,
-        plotShadow: false
-      },
-      title: {
-        text: config.path
-      },
-      plotOptions: {
-        pie: {
-          allowPointSelect: true,
-          cursor: 'pointer',
-          dataLabels: {
-            enabled: true,
-            color: '#000000',
-            connectorColor: '#000000',
-            format: '<b>{point.name}</b>: {point.percentage:.1f} %'
-          }
-        }
-      },
-      series: [{
-        type: 'pie',
-        name: config.path,
-        data: seriesData
-      }]
-    };
+    vm.chart = createChart();
   }
 
+  function createChart() {
+    var data = {};
+    angular.forEach(commits, function (commit) {
+      var author = commit.commit.author.name;
+      if (data[author]) {
+        data[author]++;
+      } else {
+        data[author] = 1;
+      }
+    });
+
+    var chart = {
+      labels: [],
+      data: [],
+      series: ["Commits"],
+      class: "chart-pie"
+    };
+
+    angular.forEach(data, function (count, author) {
+      chart.labels.push(author);
+      chart.data.push(count);
+    });
+
+    return chart;
+  }
 }
 GithubAuthorController.$inject = ["config", "commits"];
 })(window);
