@@ -237,7 +237,7 @@ angular
   .module('adf.widget.github')
   .controller('GithubHistoryController', GithubHistoryController);
 
-function GithubHistoryController(config, commits) {
+function GithubHistoryController($filter, config, commits) {
   var vm = this;
   if (commits) {
     vm.chart = createChart();
@@ -245,7 +245,12 @@ function GithubHistoryController(config, commits) {
 
   function createChart() {
     var data = {};
-    angular.forEach(commits, function (commit) {
+
+    var orderedCommits = $filter('orderBy')(commits, function(commit){
+      return commit.commit.author.date;
+    });
+
+    angular.forEach(orderedCommits, function(commit) {
       var day = commit.commit.author.date;
       day = day.substring(0, day.indexOf('T'));
 
@@ -264,7 +269,7 @@ function GithubHistoryController(config, commits) {
       class: "chart-line"
     };
 
-    angular.forEach(data, function (count, day) {
+    angular.forEach(data, function(count, day) {
       chart.labels.push(day);
       chartData.push(count);
     });
@@ -272,7 +277,7 @@ function GithubHistoryController(config, commits) {
     return chart;
   }
 }
-GithubHistoryController.$inject = ["config", "commits"];
+GithubHistoryController.$inject = ["$filter", "config", "commits"];
 
 /*
  * The MIT License
