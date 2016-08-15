@@ -31,7 +31,10 @@ angular
 function GithubService($q, $http, githubApiUrl) {
   var service = {
     getCommits: getCommits,
-    getIssues: getIssues
+    getIssues: getIssues,
+    getUserEvents: getUserEvents,
+    getOrgaEvents: getOrgaEvents,
+    getRepoEvents: getRepoEvents
   };
 
   return service;
@@ -46,8 +49,62 @@ function GithubService($q, $http, githubApiUrl) {
     return fetch(createUrl('commits', config));
   }
 
+  function getUserEvents(config) {
+    return fetch(createUrlUserEvents('events', config))
+    .then(transformData);
+  }
+
+  function getOrgaEvents(config) {
+    return fetch(createUrlOrgaEvents('events', config))
+    .then(transformData);
+  }
+
+  function getRepoEvents(config) {
+    return fetch(createUrl('events', config))
+    .then(transformData);
+  }
+
+  function transformData(data){
+    for(var i = 0; i<data.length; i++){
+
+      data[i].eventImage = data[i].actor.avatar_url;
+      data[i].eventUserUrl = 'https://github.com/' + data[i].actor.login;
+      data[i].eventTitle = data[i].type;
+
+      if(data[i].payload.pull_request){
+        data[i].eventMessage = data[i].payload.pull_request.title;
+        data[i].eventEventUrl = data[i].payload.pull_request.html_url;
+      }
+      else {
+        data[i].eventMessage = "todo";
+        data[i].eventEventUrl = "todo";
+      }
+    }
+    return data;
+  }
+
   function createUrl(type, config){
-    var url = githubApiUrl + config.path + '/' + type + '?callback=JSON_CALLBACK';
+    var url = githubApiUrl + 'repos/' + config.path + '/' + type + '?callback=JSON_CALLBACK';
+    if (config.accessToken){
+      url += '&access_token=' + config.accessToken;
+    }
+    return url;
+  }
+
+  function createUrlUserEvents(type, config){
+    var url = githubApiUrl + 'users/' + config.user + '/' + type;
+    if(config.org){
+      url += '/orgs/' + config.org;
+    }
+    url += '?callback=JSON_CALLBACK';
+    if (config.accessToken){
+      url += '&access_token=' + config.accessToken;
+    }
+    return url;
+  }
+
+  function createUrlOrgaEvents(type, config){
+    var url = githubApiUrl + 'orgs/' + config.org + '/' + type + '?callback=JSON_CALLBACK';
     if (config.accessToken){
       url += '&access_token=' + config.accessToken;
     }

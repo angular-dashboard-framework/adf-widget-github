@@ -1,0 +1,31 @@
+<div>
+  <div ng-if="!config.path" class="alert alert-info">
+    Please configure the widget
+  </div>
+  <div ng-if="config.path">
+    <ul class="media-list">
+      <li class="media" ng-repeat="event in vm.events">
+        <div class="media-left">
+          <a href="{{event.eventUserUrl}}" target="_blank">
+            <img class="media-object img-thumbnail"
+                ng-src="{{event.eventImage}}"
+                style="width: 64px; height: 64px;"
+                alt="">
+          </a>
+        </div>
+        <div class="media-body">
+          <h4 class="media-heading">
+            <a href="{{event.eventEventUrl}}" target="_blank">
+              {{event.eventTitle}}
+            </a>
+          </h4>
+          <p>{{event.eventMessage | limitTo: 128}}</p>
+          <small>
+            <a href="{{event.eventUserUrl}}" target="_blank">{{event.actor.login}}</a>,
+            {{event.created_at | date: 'yyyy-MM-dd HH:mm'}}
+          </small>
+        </div>
+      </li>
+    </ul>
+  </div>
+</div>
