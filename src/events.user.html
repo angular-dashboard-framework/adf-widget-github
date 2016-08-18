@@ -6,22 +6,23 @@
     <ul class="media-list">
       <li class="media" ng-repeat="event in vm.events">
         <div class="media-left">
-          <a href="{{event.eventUserUrl}}" target="_blank">
+          <a href="{{event.userUrl}}" target="_blank">
             <img class="media-object img-thumbnail"
-                ng-src="{{event.eventImage}}"
+                ng-src="{{event.userImage}}"
                 style="width: 64px; height: 64px;"
                 alt="">
           </a>
         </div>
         <div class="media-body">
           <h4 class="media-heading">
-            <a href="{{event.eventEventUrl}}" target="_blank">
-              {{event.eventTitle}}
-            </a>
+            <a href="{{event.userUrl}}" target="_blank">{{event.actor.login}}</a>  {{event.message | limitTo: 128}}
           </h4>
-          <p>{{event.eventMessage | limitTo: 128}}</p>
+           <p ng-if="event.comments" ng-repeat="comment in event.comments | limitTo:2">
+             <a ng-if="comment.link" href="{{comment.link}}">{{comment.id | limitTo: 7}}:</a>{{comment.message | limitTo: 50}}
+           </p>
+           <p ng-if="!event.comments">{{event.commentMessage | limitTo: 50}}</p>
           <small>
-            <a href="{{event.eventUserUrl}}" target="_blank">{{event.actor.login}}</a>,
+            <a href="{{event.userUrl}}" target="_blank">{{event.actor.login}}</a>,
             {{event.created_at | date: 'yyyy-MM-dd HH:mm'}}
           </small>
         </div>

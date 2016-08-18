@@ -67,17 +67,59 @@ function GithubService($q, $http, githubApiUrl) {
   function transformData(data){
     for(var i = 0; i<data.length; i++){
 
-      data[i].eventImage = data[i].actor.avatar_url;
-      data[i].eventUserUrl = 'https://github.com/' + data[i].actor.login;
-      data[i].eventTitle = data[i].type;
+      data[i].userImage = data[i].actor.avatar_url;
+      data[i].userUrl = 'https://github.com/' + data[i].actor.login;
+      data[i].repoName = data[i].repo.name;
+      data[i].repoUrl = 'https://github.com/' + data[i].repo.name;
 
-      if(data[i].payload.pull_request){
-        data[i].eventMessage = data[i].payload.pull_request.title;
-        data[i].eventEventUrl = data[i].payload.pull_request.html_url;
+      if(data[i].type === "PullRequestEvent"){
+        if (data[i].payload.action === "closed") {
+          data[i].message = "closed pull request " + data[i].repoName + "#" + data[i].payload.number;
+        }
+        else if (data[i].payload.action === "opened"){
+          data[i].message = "opened pull request " + data[i].repoName + "#" + data[i].payload.number;
+        }
+        if(data[i].payload.pull_request){
+          data[i].commentMessage = data[i].payload.pull_request.title;
+        }
       }
-      else {
-        data[i].eventMessage = "todo";
-        data[i].eventEventUrl = "todo";
+      else if (data[i].type === "PushEvent") {
+        data[i].message = "pushed to "+ (data[i].payload.ref).substring(11) +" at "+ data[i].repo.name;
+        if (data[i].payload.commits){
+          data[i].comments = data[i].payload.commits;
+          for (var j = 0; j < data[i].payload.commits.length; j++){
+            data[i].comments[j].id = data[i].payload.commits[j].sha;
+            data[i].comments[j].link = data[i].repoUrl +"/commit/"+data[i].payload.commits[j].sha;
+            data[i].comments[j].message = data[i].payload.commits[j].message;
+          }
+        }
+      }
+      else if (data[i].type === "IssueCommentEvent") {
+        data[i].message = "commented on issue " + data[i].repoName + "#" + data[i].payload.issue.number;
+        if (data[i].payload.issue.pull_request) {
+          data[i].message = "commented on pull request " + data[i].repoName + "#" + data[i].payload.issue.number;
+        }
+        if(data[i].payload.comment){
+          data[i].commentMessage = data[i].payload.comment.body;
+        }
+      }
+      else if (data[i].type === "IssuesEvent") {
+        if (data[i].payload.action === "closed") {
+          data[i].message = "closed issue " + data[i].repoName + "#" + data[i].payload.issue.number;
+          data[i].commentMessage = data[i].payload.issue.body;
+        }
+      }
+      else if (data[i].type === "DeleteEvent") {
+        data[i].message = "deleted " + data[i].payload.ref_type + " " + data[i].payload.ref + " at " + data[i].repoName;
+      }
+      else if (data[i].type === "ReleaseEvent") {
+        data[i].message = "released " + data[i].payload.release.name + " at " + data[i].repoName;
+        if (data[i].payload.release.assets){
+          data[i].comments = data[i].payload.release.assets;
+          for (var j = 0; j < data[i].payload.release.assets.length; j++){
+            data[i].comments[j].message = data[i].payload.release.assets[j].name;
+          }
+        }
       }
     }
     return data;
