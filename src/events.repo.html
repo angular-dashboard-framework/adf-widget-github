@@ -1,0 +1,34 @@
+<div>
+  <div ng-if="!config.path" class="alert alert-info">
+    Please configure the widget
+  </div>
+  <div ng-if="config.path">
+    <ul class="media-list">
+      <li class="media" ng-repeat="event in vm.events">
+        <div class="media-left">
+          <a href="{{event.userUrl}}" target="_blank">
+            <img class="media-object img-thumbnail"
+                ng-src="{{event.userImage}}"
+                style="width: 64px; height: 64px;"
+                alt="">
+          </a>
+        </div>
+        <div class="media-body">
+          <h4 class="media-heading">
+            <a href="{{event.userUrl}}" target="_blank">{{event.actor.login}}</a>
+            <span> {{event.messageAction | limitTo: 128}}<a href="{{event.linkElementOne}}">{{event.messageElementOne}}</a></span>
+            <span ng-if="event.messageElementTwo"> at <a href="{{event.linkElementTwo}}">{{event.messageElementTwo}}</a></span>
+          </h4>
+           <p ng-if="event.comments" ng-repeat="comment in event.comments | limitTo:2">
+             <a ng-if="comment.link" href="{{comment.link}}">{{comment.id | limitTo: 7}}</a>
+             <span>{{comment.message | limitTo: 128}}</span>
+           </p>
+          <small>
+            <a href="{{event.userUrl}}" target="_blank">{{event.actor.login}}</a>,
+            {{event.created_at | date: 'yyyy-MM-dd HH:mm'}}
+          </small>
+        </div>
+      </li>
+    </ul>
+  </div>
+</div>

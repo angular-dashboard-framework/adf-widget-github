@@ -26,7 +26,7 @@
 
 angular
   .module('adf.widget.github', ['adf.provider', 'chart.js'])
-  .value('githubApiUrl', 'https://api.github.com/repos/')
+  .value('githubApiUrl', 'https://api.github.com/')
   .config(RegisterWidgets);
 
 function RegisterWidgets(dashboardProvider) {
@@ -83,5 +83,62 @@ function RegisterWidgets(dashboardProvider) {
           }
         }
       }
-    }, widget));
+    }, widget))
+    .widget('githubUserEvents', {
+      title: 'Github User Events',
+      description: 'Display events of a certain user.',
+      category: 'GitHub',
+      controller: 'GithubEventsController',
+      controllerAs: 'vm',
+      templateUrl: '{widgetsPath}/github/src/events.user.html',
+      reload: true,
+      edit: {
+        templateUrl: '{widgetsPath}/github/src/events.user.edit.html'
+      },
+      resolve: {
+        events: function(github, config){
+          if (config.user){
+            return github.getUserEvents(config);
+          }
+        }
+      }
+    })
+    .widget('githubOrganisationEvents', {
+      title: 'Github Organisation Events',
+      description: 'Display events of a public organisation.',
+      category: 'GitHub',
+      controller: 'GithubEventsController',
+      controllerAs: 'vm',
+      templateUrl: '{widgetsPath}/github/src/events.org.html',
+      reload: true,
+      edit: {
+        templateUrl: '{widgetsPath}/github/src/events.org.edit.html'
+      },
+      resolve: {
+        events: function(github, config){
+          if (config.org){
+            return github.getOrgaEvents(config);
+          }
+        }
+      }
+    })
+    .widget('githubRepoEvents', {
+      title: 'Github Repository Events',
+      description: 'Display events of a certain repository.',
+      category: 'GitHub',
+      controller: 'GithubEventsController',
+      controllerAs: 'vm',
+      templateUrl: '{widgetsPath}/github/src/events.repo.html',
+      reload: true,
+      edit: {
+        templateUrl: '{widgetsPath}/github/src/events.repo.edit.html'
+      },
+      resolve: {
+        events: function(github, config){
+          if (config.path){
+            return github.getRepoEvents(config);
+          }
+        }
+      }
+    });
 }
