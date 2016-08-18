@@ -72,57 +72,124 @@ function GithubService($q, $http, githubApiUrl) {
       data[i].repoName = data[i].repo.name;
       data[i].repoUrl = 'https://github.com/' + data[i].repo.name;
 
-      if(data[i].type === "PullRequestEvent"){
-        if (data[i].payload.action === "closed") {
-          data[i].message = "closed pull request " + data[i].repoName + "#" + data[i].payload.number;
+      var repoName = data[i].repo.name;
+      var repoUrl = data[i].repoUrl;
+
+      var eventType = data[i].type;
+
+      if(eventType === "PullRequestEvent"){
+
+        var issueNumer = data[i].payload.number;
+        var actionStatus = data[i].payload.action;
+
+        if (actionStatus === "closed") {
+          data[i].messageAction = "closed pull request ";
+          data[i].messageElementOne = repoName + "#" + issueNumer;
+          data[i].linkElementOne = repoUrl + "/issues/" + issueNumer;
         }
-        else if (data[i].payload.action === "opened"){
-          data[i].message = "opened pull request " + data[i].repoName + "#" + data[i].payload.number;
+        else if (actionStatus === "opened"){
+          data[i].messageAction = "opened pull request ";
+          data[i].messageElementOne = repoName + "#" + issueNumer;
+          data[i].linkElementOne = repoUrl + "/issues/" + issueNumer;
         }
         if(data[i].payload.pull_request){
-          data[i].commentMessage = data[i].payload.pull_request.title;
+          data[i].comments = bindSingleComment(data[i].payload.pull_request.title);
         }
       }
-      else if (data[i].type === "PushEvent") {
-        data[i].message = "pushed to "+ (data[i].payload.ref).substring(11) +" at "+ data[i].repo.name;
+      else if (eventType === "PushEvent") {
+        data[i].messageAction = "pushed to ";
+        data[i].messageElementOne = (data[i].payload.ref).substring(11);
+        data[i].linkElementOne = repoUrl + "/tree/" + data[i].messageElementOne;
+        data[i].messageElementTwo = repoName;
+        data[i].linkElementTwo = repoUrl;
+
         if (data[i].payload.commits){
-          data[i].comments = data[i].payload.commits;
-          for (var j = 0; j < data[i].payload.commits.length; j++){
-            data[i].comments[j].id = data[i].payload.commits[j].sha;
-            data[i].comments[j].link = data[i].repoUrl +"/commit/"+data[i].payload.commits[j].sha;
-            data[i].comments[j].message = data[i].payload.commits[j].message;
+
+          var itLength = data[i].payload.commits.length;
+          var comments = [];
+
+          for (var j = 0; j < itLength; j++){
+
+            var sha = data[i].payload.commits[j].sha;
+            var object = {
+              "id": sha,
+              "link": repoUrl + "/commit/" + sha,
+              "message": data[i].payload.commits[j].message
+            };
+            comments.push(object);
           }
+          data[i].comments = comments;
         }
       }
-      else if (data[i].type === "IssueCommentEvent") {
-        data[i].message = "commented on issue " + data[i].repoName + "#" + data[i].payload.issue.number;
+      else if (eventType === "IssueCommentEvent") {
+
+        var issueNumber = data[i].payload.issue.number;
+
+        data[i].messageAction = "commented on issue ";
+        data[i].messageElementOne = repoName + "#" + issueNumber;
+        data[i].linkElementOne = repoUrl + "/issues/" + issueNumber;
+
         if (data[i].payload.issue.pull_request) {
-          data[i].message = "commented on pull request " + data[i].repoName + "#" + data[i].payload.issue.number;
+          data[i].messageAction = "commented on pull request ";
         }
         if(data[i].payload.comment){
-          data[i].commentMessage = data[i].payload.comment.body;
+          data[i].comments = bindSingleComment(data[i].payload.comment.body);
         }
       }
-      else if (data[i].type === "IssuesEvent") {
-        if (data[i].payload.action === "closed") {
-          data[i].message = "closed issue " + data[i].repoName + "#" + data[i].payload.issue.number;
-          data[i].commentMessage = data[i].payload.issue.body;
+      else if (eventType === "IssuesEvent") {
+        var actionStatus = data[i].payload.action;
+
+        if (actionStatus === "closed") {
+          data[i].messageAction = "closed issue ";
+        }
+        else if (actionStatus === "opened"){
+          data[i].messageAction = "opened issue ";
+        }
+        var issueNumber = data[i].payload.issue.number;
+
+        data[i].messageElementOne = repoName + "#" + issueNumber;
+        data[i].linkElementOne = repoUrl + "/issues/" + issueNumber;
+        if (data[i].payload.issue.title) {
+          data[i].comments = bindSingleComment(data[i].payload.issue.title);
         }
       }
-      else if (data[i].type === "DeleteEvent") {
-        data[i].message = "deleted " + data[i].payload.ref_type + " " + data[i].payload.ref + " at " + data[i].repoName;
+      else if (eventType === "DeleteEvent") {
+        data[i].messageAction = "deleted " + data[i].payload.ref_type + " " + data[i].payload.ref + " at ";
+        data[i].messageElementOne = repoName;
+        data[i].linkElementOne = repoUrl;
       }
-      else if (data[i].type === "ReleaseEvent") {
-        data[i].message = "released " + data[i].payload.release.name + " at " + data[i].repoName;
+      else if (eventType === "ReleaseEvent") {
+        var releaseName = data[i].payload.release.name;
+
+        data[i].messageAction = "released "
+        data[i].messageElementOne = releaseName;
+        data[i].linkElementOne = repoUrl + "/releases/tag/" + releaseName;
+        data[i].messageElementTwo = repoName;
+        data[i].linkElementTwo = repoUrl;
+
         if (data[i].payload.release.assets){
-          data[i].comments = data[i].payload.release.assets;
-          for (var j = 0; j < data[i].payload.release.assets.length; j++){
-            data[i].comments[j].message = data[i].payload.release.assets[j].name;
+          var itLength = data[i].payload.release.assets.length;
+          var comments = [];
+          for (var j = 0; j < itLength; j++){
+            var object = {
+              "message": data[i].payload.release.assets[j].name
+            };
+            comments.push(object);
           }
+          data[i].comments = comments;
         }
       }
     }
     return data;
+  }
+  // returns array containing str to be bound to data-file
+  function bindSingleComment(str){
+    var comments = [];
+    var object = {
+      "message": str
+    };
+    comments.push(object);
+    return comments;
   }
 
   function createUrl(type, config){
