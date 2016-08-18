@@ -148,11 +148,11 @@ RegisterWidgets.$inject = ["dashboardProvider"];
 angular.module("adf.widget.github").run(["$templateCache", function($templateCache) {$templateCache.put("{widgetsPath}/github/src/commits.html","<div><div ng-if=!vm.commits class=\"alert alert-info\">Please configure the widget</div><div ng-if=config.path><ul class=media-list><li class=media ng-repeat=\"commit in vm.commits\"><div class=media-left><a href={{commit.author.html_url}} target=_blank><img class=\"media-object img-thumbnail\" ng-src={{commit.author.avatar_url}} style=\"width: 64px; height: 64px;\"></a></div><div class=media-body><h4 class=media-heading><a href={{commit.html_url}} target=_blank>{{commit.sha | limitTo: 12}}</a></h4><p>{{commit.commit.message | limitTo: 128}}</p><small><a href={{commit.author.html_url}} target=_blank>{{commit.commit.author.name}}</a>, {{commit.commit.author.date | date: \'yyyy-MM-dd HH:mm\'}}</small></div></li></ul></div></div>");
 $templateCache.put("{widgetsPath}/github/src/edit.html","<form role=form><div class=form-group><label for=path>Github Repository Path</label> <input type=text class=form-control id=path ng-model=config.path placeholder=\"Enter Path (username/reponame)\"></div><div class=form-group><label for=path>Access Token</label> <input type=text class=form-control id=path ng-model=config.accessToken></div></form>");
 $templateCache.put("{widgetsPath}/github/src/events.org.edit.html","<form role=form><div class=form-group><label for=path>Organisation</label> <input type=text class=form-control id=path ng-model=config.org placeholder=\"Enter Organisation\"></div><div class=form-group><label for=path>Access Token</label> <input type=text class=form-control id=path ng-model=config.accessToken></div></form>");
-$templateCache.put("{widgetsPath}/github/src/events.org.html","<div><div ng-if=!config.org class=\"alert alert-info\">Please configure the widget</div><div ng-if=config.org><ul class=media-list><li class=media ng-repeat=\"event in vm.events\"><div class=media-left><a href={{event.userUrl}} target=_blank><img class=\"media-object img-thumbnail\" ng-src={{event.userImage}} style=\"width: 64px; height: 64px;\"></a></div><div class=media-body><h4 class=media-heading><a href={{event.userUrl}} target=_blank>{{event.actor.login}}</a> {{event.message | limitTo: 128}}</h4><p ng-if=event.comments ng-repeat=\"comment in event.comments | limitTo:2\"><a ng-if=comment.link href={{comment.link}}>{{comment.id | limitTo: 7}}:</a>{{comment.message | limitTo: 50}}</p><p ng-if=!event.comments>{{event.commentMessage | limitTo: 50}}</p><small><a href={{event.userUrl}} target=_blank>{{event.actor.login}}</a>, {{event.created_at | date: \'yyyy-MM-dd HH:mm\'}}</small></div></li></ul></div></div>");
+$templateCache.put("{widgetsPath}/github/src/events.org.html","<div><div ng-if=!config.org class=\"alert alert-info\">Please configure the widget</div><div ng-if=config.org><ul class=media-list><li class=media ng-repeat=\"event in vm.events\"><div class=media-left><a href={{event.userUrl}} target=_blank><img class=\"media-object img-thumbnail\" ng-src={{event.userImage}} style=\"width: 64px; height: 64px;\"></a></div><div class=media-body><h4 class=media-heading><a href={{event.userUrl}} target=_blank>{{event.actor.login}}</a> <span>{{event.messageAction | limitTo: 128}} <a href={{event.linkElementOne}}>{{event.messageElementOne}}</a></span> <span ng-if=event.messageElementTwo>at <a href={{event.linkElementTwo}}>{{event.messageElementTwo}}</a></span></h4><p ng-if=event.comments ng-repeat=\"comment in event.comments | limitTo:2\"><a ng-if=comment.link href={{comment.link}}>{{comment.id | limitTo: 7}}&nbsp;</a> <span>{{comment.message | limitTo: 128}}</span></p><small><a href={{event.userUrl}} target=_blank>{{event.actor.login}}</a>, {{event.created_at | date: \'yyyy-MM-dd HH:mm\'}}</small></div></li></ul></div></div>");
 $templateCache.put("{widgetsPath}/github/src/events.repo.edit.html","<form role=form><div class=form-group><label for=path>Github Repository Path</label> <input type=text class=form-control id=path ng-model=config.path placeholder=\"Enter Path (owner/reponame)\"></div><div class=form-group><label for=path>Access Token</label> <input type=text class=form-control id=path ng-model=config.accessToken></div></form>");
-$templateCache.put("{widgetsPath}/github/src/events.repo.html","<div><div ng-if=!config.path class=\"alert alert-info\">Please configure the widget</div><div ng-if=config.path><ul class=media-list><li class=media ng-repeat=\"event in vm.events\"><div class=media-left><a href={{event.userUrl}} target=_blank><img class=\"media-object img-thumbnail\" ng-src={{event.userImage}} style=\"width: 64px; height: 64px;\"></a></div><div class=media-body><h4 class=media-heading><a href={{event.userUrl}} target=_blank>{{event.actor.login}}</a> {{event.message | limitTo: 128}}</h4><p ng-if=event.comments ng-repeat=\"comment in event.comments | limitTo:2\"><a href={{comment.link}}>{{comment.id | limitTo: 7}}:</a>{{comment.message | limitTo: 50}}</p><p ng-if=!event.comments>{{event.commentMessage | limitTo: 50}}</p><small><a href={{event.userUrl}} target=_blank>{{event.actor.login}}</a>, {{event.created_at | date: \'yyyy-MM-dd HH:mm\'}}</small></div></li></ul></div></div>");
+$templateCache.put("{widgetsPath}/github/src/events.repo.html","<div><div ng-if=!config.path class=\"alert alert-info\">Please configure the widget</div><div ng-if=config.path><ul class=media-list><li class=media ng-repeat=\"event in vm.events\"><div class=media-left><a href={{event.userUrl}} target=_blank><img class=\"media-object img-thumbnail\" ng-src={{event.userImage}} style=\"width: 64px; height: 64px;\"></a></div><div class=media-body><h4 class=media-heading><a href={{event.userUrl}} target=_blank>{{event.actor.login}}</a> <span>{{event.messageAction | limitTo: 128}}<a href={{event.linkElementOne}}>{{event.messageElementOne}}</a></span> <span ng-if=event.messageElementTwo>at <a href={{event.linkElementTwo}}>{{event.messageElementTwo}}</a></span></h4><p ng-if=event.comments ng-repeat=\"comment in event.comments | limitTo:2\"><a ng-if=comment.link href={{comment.link}}>{{comment.id | limitTo: 7}}</a> <span>{{comment.message | limitTo: 128}}</span></p><small><a href={{event.userUrl}} target=_blank>{{event.actor.login}}</a>, {{event.created_at | date: \'yyyy-MM-dd HH:mm\'}}</small></div></li></ul></div></div>");
 $templateCache.put("{widgetsPath}/github/src/events.user.edit.html","<form role=form><div class=form-group><label for=path>User Name</label> <input type=text class=form-control id=path ng-model=config.user placeholder=\"Enter User (username)\"></div><div class=form-group><label for=path>Organisation</label> <input type=text class=form-control id=path ng-model=config.org placeholder=\"(Optional) Enter Organisation\"></div><div class=form-group><label for=path>Access Token</label> <input type=text class=form-control id=path ng-model=config.accessToken></div></form>");
-$templateCache.put("{widgetsPath}/github/src/events.user.html","<div><div ng-if=!config.user class=\"alert alert-info\">Please configure the widget</div><div ng-if=config.user><ul class=media-list><li class=media ng-repeat=\"event in vm.events\"><div class=media-left><a href={{event.userUrl}} target=_blank><img class=\"media-object img-thumbnail\" ng-src={{event.userImage}} style=\"width: 64px; height: 64px;\"></a></div><div class=media-body><h4 class=media-heading><a href={{event.userUrl}} target=_blank>{{event.actor.login}}</a> {{event.message | limitTo: 128}}</h4><p ng-if=event.comments ng-repeat=\"comment in event.comments | limitTo:2\"><a ng-if=comment.link href={{comment.link}}>{{comment.id | limitTo: 7}}:</a>{{comment.message | limitTo: 50}}</p><p ng-if=!event.comments>{{event.commentMessage | limitTo: 50}}</p><small><a href={{event.userUrl}} target=_blank>{{event.actor.login}}</a>, {{event.created_at | date: \'yyyy-MM-dd HH:mm\'}}</small></div></li></ul></div></div>");
+$templateCache.put("{widgetsPath}/github/src/events.user.html","<div><div ng-if=!config.user class=\"alert alert-info\">Please configure the widget</div><div ng-if=config.user><ul class=media-list><li class=media ng-repeat=\"event in vm.events\"><div class=media-left><a href={{event.userUrl}} target=_blank><img class=\"media-object img-thumbnail\" ng-src={{event.userImage}} style=\"width: 64px; height: 64px;\"></a></div><div class=media-body><h4 class=media-heading><a href={{event.userUrl}} target=_blank>{{event.actor.login}}</a> <span>{{event.messageAction | limitTo: 128}}<a href={{event.linkElementOne}}>{{event.messageElementOne}}</a></span> <span ng-if=event.messageElementTwo>at <a href={{event.linkElementTwo}}>{{event.messageElementTwo}}</a></span></h4><p ng-if=event.comments ng-repeat=\"comment in event.comments | limitTo:2\"><a ng-if=comment.link href={{comment.link}}>{{comment.id | limitTo: 7}}</a> {{comment.message | limitTo: 128}}</p><small><a href={{event.userUrl}} target=_blank>{{event.actor.login}}</a>, {{event.created_at | date: \'yyyy-MM-dd HH:mm\'}}</small></div></li></ul></div></div>");
 $templateCache.put("{widgetsPath}/github/src/issues.html","<div><div ng-if=!config.path class=\"alert alert-info\">Please configure the widget</div><div ng-if=config.path><ul class=media-list><li class=media ng-repeat=\"issue in vm.issues\"><div class=media-left><a href={{issue.user.html_url}} target=_blank><img class=\"media-object img-thumbnail\" ng-src={{issue.user.avatar_url}} style=\"width: 64px; height: 64px;\"></a></div><div class=media-body><h4 class=media-heading><a href={{issue.html_url}} target=_blank>#{{issue.number}} {{issue.title}}</a></h4><p>{{issue.body | limitTo: 128}}</p><small><a href={{issue.user.html_url}} target=_blank>{{issue.user.login}}</a>, {{issue.created_at | date: \'yyyy-MM-dd HH:mm\'}}</small></div></li></ul></div></div>");
 $templateCache.put("{widgetsPath}/github/src/line-chart.html","<div><div class=\"alert alert-info\" ng-if=!vm.chart>Please insert a repository path in the widget configuration</div><div ng-if=vm.chart><canvas id=line class=\"chart chart-line\" chart-data=vm.chart.data chart-labels=vm.chart.labels chart-series=vm.chart.series></canvas></div></div>");
 $templateCache.put("{widgetsPath}/github/src/pie-chart.html","<div><div class=\"alert alert-info\" ng-if=!vm.chart>Please insert a repository path in the widget configuration</div><div ng-if=vm.chart><canvas id=pie class=\"chart chart-pie\" chart-legend=true chart-data=vm.chart.data chart-labels=vm.chart.labels></canvas></div></div>");}]);
@@ -230,57 +230,124 @@ function GithubService($q, $http, githubApiUrl) {
       data[i].repoName = data[i].repo.name;
       data[i].repoUrl = 'https://github.com/' + data[i].repo.name;
 
-      if(data[i].type === "PullRequestEvent"){
-        if (data[i].payload.action === "closed") {
-          data[i].message = "closed pull request " + data[i].repoName + "#" + data[i].payload.number;
+      var repoName = data[i].repo.name;
+      var repoUrl = data[i].repoUrl;
+
+      var eventType = data[i].type;
+
+      if(eventType === "PullRequestEvent"){
+
+        var issueNumer = data[i].payload.number;
+        var actionStatus = data[i].payload.action;
+
+        if (actionStatus === "closed") {
+          data[i].messageAction = "closed pull request ";
+          data[i].messageElementOne = repoName + "#" + issueNumer;
+          data[i].linkElementOne = repoUrl + "/issues/" + issueNumer;
         }
-        else if (data[i].payload.action === "opened"){
-          data[i].message = "opened pull request " + data[i].repoName + "#" + data[i].payload.number;
+        else if (actionStatus === "opened"){
+          data[i].messageAction = "opened pull request ";
+          data[i].messageElementOne = repoName + "#" + issueNumer;
+          data[i].linkElementOne = repoUrl + "/issues/" + issueNumer;
         }
         if(data[i].payload.pull_request){
-          data[i].commentMessage = data[i].payload.pull_request.title;
+          data[i].comments = bindSingleComment(data[i].payload.pull_request.title);
         }
       }
-      else if (data[i].type === "PushEvent") {
-        data[i].message = "pushed to "+ (data[i].payload.ref).substring(11) +" at "+ data[i].repo.name;
+      else if (eventType === "PushEvent") {
+        data[i].messageAction = "pushed to ";
+        data[i].messageElementOne = (data[i].payload.ref).substring(11);
+        data[i].linkElementOne = repoUrl + "/tree/" + data[i].messageElementOne;
+        data[i].messageElementTwo = repoName;
+        data[i].linkElementTwo = repoUrl;
+
         if (data[i].payload.commits){
-          data[i].comments = data[i].payload.commits;
-          for (var j = 0; j < data[i].payload.commits.length; j++){
-            data[i].comments[j].id = data[i].payload.commits[j].sha;
-            data[i].comments[j].link = data[i].repoUrl +"/commit/"+data[i].payload.commits[j].sha;
-            data[i].comments[j].message = data[i].payload.commits[j].message;
+
+          var itLength = data[i].payload.commits.length;
+          var comments = [];
+
+          for (var j = 0; j < itLength; j++){
+
+            var sha = data[i].payload.commits[j].sha;
+            var object = {
+              "id": sha,
+              "link": repoUrl + "/commit/" + sha,
+              "message": data[i].payload.commits[j].message
+            };
+            comments.push(object);
           }
+          data[i].comments = comments;
         }
       }
-      else if (data[i].type === "IssueCommentEvent") {
-        data[i].message = "commented on issue " + data[i].repoName + "#" + data[i].payload.issue.number;
+      else if (eventType === "IssueCommentEvent") {
+
+        var issueNumber = data[i].payload.issue.number;
+
+        data[i].messageAction = "commented on issue ";
+        data[i].messageElementOne = repoName + "#" + issueNumber;
+        data[i].linkElementOne = repoUrl + "/issues/" + issueNumber;
+
         if (data[i].payload.issue.pull_request) {
-          data[i].message = "commented on pull request " + data[i].repoName + "#" + data[i].payload.issue.number;
+          data[i].messageAction = "commented on pull request ";
         }
         if(data[i].payload.comment){
-          data[i].commentMessage = data[i].payload.comment.body;
+          data[i].comments = bindSingleComment(data[i].payload.comment.body);
         }
       }
-      else if (data[i].type === "IssuesEvent") {
-        if (data[i].payload.action === "closed") {
-          data[i].message = "closed issue " + data[i].repoName + "#" + data[i].payload.issue.number;
-          data[i].commentMessage = data[i].payload.issue.body;
+      else if (eventType === "IssuesEvent") {
+        var actionStatus = data[i].payload.action;
+
+        if (actionStatus === "closed") {
+          data[i].messageAction = "closed issue ";
+        }
+        else if (actionStatus === "opened"){
+          data[i].messageAction = "opened issue ";
+        }
+        var issueNumber = data[i].payload.issue.number;
+
+        data[i].messageElementOne = repoName + "#" + issueNumber;
+        data[i].linkElementOne = repoUrl + "/issues/" + issueNumber;
+        if (data[i].payload.issue.title) {
+          data[i].comments = bindSingleComment(data[i].payload.issue.title);
         }
       }
-      else if (data[i].type === "DeleteEvent") {
-        data[i].message = "deleted " + data[i].payload.ref_type + " " + data[i].payload.ref + " at " + data[i].repoName;
+      else if (eventType === "DeleteEvent") {
+        data[i].messageAction = "deleted " + data[i].payload.ref_type + " " + data[i].payload.ref + " at ";
+        data[i].messageElementOne = repoName;
+        data[i].linkElementOne = repoUrl;
       }
-      else if (data[i].type === "ReleaseEvent") {
-        data[i].message = "released " + data[i].payload.release.name + " at " + data[i].repoName;
+      else if (eventType === "ReleaseEvent") {
+        var releaseName = data[i].payload.release.name;
+
+        data[i].messageAction = "released "
+        data[i].messageElementOne = releaseName;
+        data[i].linkElementOne = repoUrl + "/releases/tag/" + releaseName;
+        data[i].messageElementTwo = repoName;
+        data[i].linkElementTwo = repoUrl;
+
         if (data[i].payload.release.assets){
-          data[i].comments = data[i].payload.release.assets;
-          for (var j = 0; j < data[i].payload.release.assets.length; j++){
-            data[i].comments[j].message = data[i].payload.release.assets[j].name;
+          var itLength = data[i].payload.release.assets.length;
+          var comments = [];
+          for (var j = 0; j < itLength; j++){
+            var object = {
+              "message": data[i].payload.release.assets[j].name
+            };
+            comments.push(object);
           }
+          data[i].comments = comments;
         }
       }
     }
     return data;
+  }
+  // returns array containing str to be bound to data-file
+  function bindSingleComment(str){
+    var comments = [];
+    var object = {
+      "message": str
+    };
+    comments.push(object);
+    return comments;
   }
 
   function createUrl(type, config){
