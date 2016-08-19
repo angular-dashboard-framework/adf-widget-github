@@ -81,19 +81,13 @@ function GithubService($q, $http, githubApiUrl) {
 
       if(eventType === "PullRequestEvent"){
 
-        var issueNumer = data[i].payload.number;
+        var issueNumber = data[i].payload.number;
         var actionStatus = data[i].payload.action;
 
-        if (actionStatus === "closed") {
-          data[i].messageAction = "closed pull request ";
-          data[i].messageElementOne = repoName + "#" + issueNumer;
-          data[i].linkElementOne = repoUrl + "/issues/" + issueNumer;
-        }
-        else if (actionStatus === "opened"){
-          data[i].messageAction = "opened pull request ";
-          data[i].messageElementOne = repoName + "#" + issueNumer;
-          data[i].linkElementOne = repoUrl + "/issues/" + issueNumer;
-        }
+        data[i].messageAction = actionStatus + " pull request ";
+        data[i].messageElementOne = repoName + "#" + issueNumber;
+        data[i].linkElementOne = repoUrl + "/issues/" + issueNumber;
+
         if(data[i].payload.pull_request){
           data[i].comments = bindSingleComment(data[i].payload.pull_request.title);
         }
@@ -141,12 +135,8 @@ function GithubService($q, $http, githubApiUrl) {
       else if (eventType === "IssuesEvent") {
         var actionStatus = data[i].payload.action;
 
-        if (actionStatus === "closed") {
-          data[i].messageAction = "closed issue ";
-        }
-        else if (actionStatus === "opened"){
-          data[i].messageAction = "opened issue ";
-        }
+        data[i].messageAction = actionStatus + " issue ";
+        
         var issueNumber = data[i].payload.issue.number;
 
         data[i].messageElementOne = repoName + "#" + issueNumber;
