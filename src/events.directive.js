@@ -2,7 +2,7 @@
 
 angular
   .module('adf.widget.github')
-  .directive('eventDirective', function() {
+  .directive('events', function() {
     return {
       templateUrl: 'src/events.html'
     };
