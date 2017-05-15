@@ -69,7 +69,8 @@ function GithubHistoryController($filter, config, commits) {
         ]
       },
       legend: {
-        display: true
+        display: true,
+        position: "bottom"
       }
     }
     var chart = {
