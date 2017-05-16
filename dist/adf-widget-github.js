@@ -25,6 +25,13 @@
 
 
 
+RegisterWidgets.$inject = ["dashboardProvider"];
+GithubService.$inject = ["$q", "$http", "githubApiUrl"];
+GithubIssuesController.$inject = ["config", "issues"];
+GithubHistoryController.$inject = ["$filter", "config", "commits"];
+GithubEventsController.$inject = ["config", "events"];
+GithubCommitsController.$inject = ["config", "commits"];
+GithubAuthorController.$inject = ["config", "commits"];
 angular
   .module('adf.widget.github', ['adf.provider', 'chart.js'])
   .value('githubApiUrl', 'https://api.github.com/')
@@ -55,26 +62,26 @@ function RegisterWidgets(dashboardProvider) {
   // register github template by extending the template object
   dashboardProvider
     .widget('githubHistory', angular.extend({
-      title: 'Github History',
-      description: 'Display the commit history of a GitHub project as chart',
+      title: 'GitHub History',
+      description: 'Displays the commit history of a GitHub project as chart',
       controller: 'GithubHistoryController',
       templateUrl: '{widgetsPath}/github/src/line-chart.html'
     }, commitWidgets))
     .widget('githubAuthor', angular.extend({
-      title: 'Github Author',
+      title: 'GitHub Author',
       description: 'Displays the commits per author as pie chart',
       controller: 'GithubAuthorController',
       templateUrl: '{widgetsPath}/github/src/pie-chart.html'
     }, commitWidgets))
     .widget('githubCommits', angular.extend({
-      title: 'Github Commits',
-      description: 'Displays the commits as list',
+      title: 'GitHub Commits',
+      description: 'Displays the commits of a GitHub project',
       controller: 'GithubCommitsController',
       templateUrl: '{widgetsPath}/github/src/commits.html'
     }, commitWidgets))
     .widget('githubIssues', angular.extend({
-      title: 'Github Issues',
-      description: 'Displays issues as list of a GitHub project',
+      title: 'GitHub Issues',
+      description: 'Displays the issues of a GitHub project',
       controller: 'GithubIssuesController',
       templateUrl: '{widgetsPath}/github/src/issues.html',
       resolve: {
@@ -86,8 +93,8 @@ function RegisterWidgets(dashboardProvider) {
       }
     }, widget))
     .widget('githubUserEvents', {
-      title: 'Github User Events',
-      description: 'Display events of a certain user.',
+      title: 'GitHub User Events',
+      description: 'Displays events of a certain user',
       category: 'GitHub',
       controller: 'GithubEventsController',
       controllerAs: 'vm',
@@ -105,8 +112,8 @@ function RegisterWidgets(dashboardProvider) {
       }
     })
     .widget('githubOrganisationEvents', {
-      title: 'Github Organisation Events',
-      description: 'Display events of a public organisation.',
+      title: 'GitHub Organisation Events',
+      description: 'Displays events of a public organisation',
       category: 'GitHub',
       controller: 'GithubEventsController',
       controllerAs: 'vm',
@@ -124,8 +131,8 @@ function RegisterWidgets(dashboardProvider) {
       }
     })
     .widget('githubRepoEvents', {
-      title: 'Github Repository Events',
-      description: 'Display events of a certain repository.',
+      title: 'GitHub Repository Events',
+      description: 'Displays events of a certain repository',
       category: 'GitHub',
       controller: 'GithubEventsController',
       controllerAs: 'vm',
@@ -143,7 +150,6 @@ function RegisterWidgets(dashboardProvider) {
       }
     });
 }
-RegisterWidgets.$inject = ["dashboardProvider"];
 
 angular.module("adf.widget.github").run(["$templateCache", function($templateCache) {$templateCache.put("{widgetsPath}/github/src/commits.html","<div><div ng-if=!vm.commits class=\"alert alert-info\">Please configure the widget</div><div ng-if=config.path><ul class=media-list><li class=media ng-repeat=\"commit in vm.commits\"><div class=media-left><a href={{commit.author.html_url}} target=_blank><img class=\"media-object img-thumbnail\" ng-src={{commit.author.avatar_url}} style=\"width: 64px; height: 64px;\"></a></div><div class=media-body><h4 class=media-heading><a href={{commit.html_url}} target=_blank>{{commit.sha | limitTo: 12}}</a></h4><p>{{commit.commit.message | limitTo: 128}}</p><small><a href={{commit.author.html_url}} target=_blank>{{commit.commit.author.name}}</a>, {{commit.commit.author.date | date: \'yyyy-MM-dd HH:mm\'}}</small></div></li></ul></div></div>");
 $templateCache.put("{widgetsPath}/github/src/edit.html","<form role=form><div class=form-group><label for=path>Github Repository Path</label> <input type=text class=form-control id=path ng-model=config.path placeholder=\"Enter Path (username/reponame)\"></div><div class=form-group><label for=path>Access Token</label> <input type=text class=form-control id=path ng-model=config.accessToken></div></form>");
@@ -154,8 +160,8 @@ $templateCache.put("{widgetsPath}/github/src/events.repo.html","<div><div ng-if=
 $templateCache.put("{widgetsPath}/github/src/events.user.edit.html","<form role=form><div class=form-group><label for=path>User Name</label> <input type=text class=form-control id=path ng-model=config.user placeholder=\"Enter User (username)\"></div><div class=form-group><label for=path>Organisation</label> <input type=text class=form-control id=path ng-model=config.org placeholder=\"(Optional) Enter Organisation\"></div><div class=form-group><label for=path>Access Token</label> <input type=text class=form-control id=path ng-model=config.accessToken></div></form>");
 $templateCache.put("{widgetsPath}/github/src/events.user.html","<div><div ng-if=!config.user class=\"alert alert-info\">Please configure the widget</div><div ng-if=config.user><ul class=media-list><li class=media ng-repeat=\"event in vm.events\"><div class=media-left><a href={{event.userUrl}} target=_blank><img class=\"media-object img-thumbnail\" ng-src={{event.userImage}} style=\"width: 64px; height: 64px;\"></a></div><div class=media-body><h4 class=media-heading><a href={{event.userUrl}} target=_blank>{{event.actor.login}}</a> <span>{{event.messageAction | limitTo: 128}}<a href={{event.linkElementOne}}>{{event.messageElementOne}}</a></span> <span ng-if=event.messageElementTwo>at <a href={{event.linkElementTwo}}>{{event.messageElementTwo}}</a></span></h4><p ng-if=event.comments ng-repeat=\"comment in event.comments | limitTo:2\"><a ng-if=comment.link href={{comment.link}}>{{comment.id | limitTo: 7}}</a> {{comment.message | limitTo: 128}}</p><small><a href={{event.userUrl}} target=_blank>{{event.actor.login}}</a>, {{event.created_at | date: \'yyyy-MM-dd HH:mm\'}}</small></div></li></ul></div></div>");
 $templateCache.put("{widgetsPath}/github/src/issues.html","<div><div ng-if=!config.path class=\"alert alert-info\">Please configure the widget</div><div ng-if=config.path><ul class=media-list><li class=media ng-repeat=\"issue in vm.issues\"><div class=media-left><a href={{issue.user.html_url}} target=_blank><img class=\"media-object img-thumbnail\" ng-src={{issue.user.avatar_url}} style=\"width: 64px; height: 64px;\"></a></div><div class=media-body><h4 class=media-heading><a href={{issue.html_url}} target=_blank>#{{issue.number}} {{issue.title}}</a></h4><p>{{issue.body | limitTo: 128}}</p><small><a href={{issue.user.html_url}} target=_blank>{{issue.user.login}}</a>, {{issue.created_at | date: \'yyyy-MM-dd HH:mm\'}}</small></div></li></ul></div></div>");
-$templateCache.put("{widgetsPath}/github/src/line-chart.html","<div><div class=\"alert alert-info\" ng-if=!vm.chart>Please insert a repository path in the widget configuration</div><div ng-if=vm.chart><canvas id=line class=\"chart chart-line\" chart-data=vm.chart.data chart-labels=vm.chart.labels chart-series=vm.chart.series></canvas></div></div>");
-$templateCache.put("{widgetsPath}/github/src/pie-chart.html","<div><div class=\"alert alert-info\" ng-if=!vm.chart>Please insert a repository path in the widget configuration</div><div ng-if=vm.chart><canvas id=pie class=\"chart chart-pie\" chart-legend=true chart-data=vm.chart.data chart-labels=vm.chart.labels></canvas></div></div>");}]);
+$templateCache.put("{widgetsPath}/github/src/line-chart.html","<div><div class=\"alert alert-info\" ng-if=!vm.chart>Please insert a repository path in the widget configuration</div><div ng-if=vm.chart><canvas id=line class=\"chart chart-line\" chart-data=vm.chart.data chart-labels=vm.chart.labels chart-series=vm.chart.series chart-options=vm.chart.options></canvas></div></div>");
+$templateCache.put("{widgetsPath}/github/src/pie-chart.html","<div><div class=\"alert alert-info\" ng-if=!vm.chart>Please insert a repository path in the widget configuration</div><div ng-if=vm.chart><canvas id=pie class=\"chart chart-pie\" chart-legend=true chart-data=vm.chart.data chart-labels=vm.chart.labels chart-options=vm.chart.options></canvas></div></div>");}]);
 /*
  * The MIT License
  *
@@ -397,7 +403,6 @@ function GithubService($q, $http, githubApiUrl) {
     return deferred.promise;
   }
 }
-GithubService.$inject = ["$q", "$http", "githubApiUrl"];
 
 /*
  * The MIT License
@@ -434,7 +439,6 @@ function GithubIssuesController(config, issues) {
 
   vm.issues = issues;
 }
-GithubIssuesController.$inject = ["config", "issues"];
 
 /*
  * The MIT License
@@ -475,11 +479,11 @@ function GithubHistoryController($filter, config, commits) {
   function createChart() {
     var data = {};
 
-    var orderedCommits = $filter('orderBy')(commits, function(commit){
+    var orderedCommits = $filter('orderBy')(commits, function (commit) {
       return commit.commit.author.date;
     });
 
-    angular.forEach(orderedCommits, function(commit) {
+    angular.forEach(orderedCommits, function (commit) {
       var day = commit.commit.author.date;
       day = day.substring(0, day.indexOf('T'));
 
@@ -491,14 +495,35 @@ function GithubHistoryController($filter, config, commits) {
     });
 
     var chartData = [];
+    var options = {
+      scales: {
+        yAxes: [
+          {
+            id: 'y-axis-1',
+            display: true,
+            position: 'left',
+            ticks: { fixedStepSize: 1 },
+            scaleLabel: {
+              display: true,
+              labelString: 'Commits'
+            }
+          }
+        ]
+      },
+      legend: {
+        display: true,
+        position: "bottom"
+      }
+    }
     var chart = {
       labels: [],
       data: [chartData],
-      series: ["Commits"],
-      class: "chart-line"
+      series: [config.path],
+      class: "chart-line",
+      options: options
     };
 
-    angular.forEach(data, function(count, day) {
+    angular.forEach(data, function (count, day) {
       chart.labels.push(day);
       chartData.push(count);
     });
@@ -506,7 +531,6 @@ function GithubHistoryController($filter, config, commits) {
     return chart;
   }
 }
-GithubHistoryController.$inject = ["$filter", "config", "commits"];
 
 /*
  * The MIT License
@@ -543,7 +567,6 @@ function GithubEventsController(config, events) {
 
   vm.events = events;
 }
-GithubEventsController.$inject = ["config", "events"];
 
 /*
  * The MIT License
@@ -580,7 +603,6 @@ function GithubCommitsController(config, commits) {
 
   vm.commits = commits;
 }
-GithubCommitsController.$inject = ["config", "commits"];
 
 /*
  * The MIT License
@@ -630,11 +652,19 @@ function GithubAuthorController(config, commits) {
       }
     });
 
+    var options = {
+      legend: {
+        display: true,
+        position: "bottom"
+      }
+    }
+
     var chart = {
       labels: [],
       data: [],
       series: ["Commits"],
-      class: "chart-pie"
+      class: "chart-pie",
+      options: options
     };
 
     angular.forEach(data, function (count, author) {
@@ -645,5 +675,4 @@ function GithubAuthorController(config, commits) {
     return chart;
   }
 }
-GithubAuthorController.$inject = ["config", "commits"];
 })(window);
