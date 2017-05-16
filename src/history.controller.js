@@ -37,11 +37,11 @@ function GithubHistoryController($filter, config, commits) {
   function createChart() {
     var data = {};
 
-    var orderedCommits = $filter('orderBy')(commits, function(commit){
+    var orderedCommits = $filter('orderBy')(commits, function (commit) {
       return commit.commit.author.date;
     });
 
-    angular.forEach(orderedCommits, function(commit) {
+    angular.forEach(orderedCommits, function (commit) {
       var day = commit.commit.author.date;
       day = day.substring(0, day.indexOf('T'));
 
@@ -53,14 +53,35 @@ function GithubHistoryController($filter, config, commits) {
     });
 
     var chartData = [];
+    var options = {
+      scales: {
+        yAxes: [
+          {
+            id: 'y-axis-1',
+            display: true,
+            position: 'left',
+            ticks: { fixedStepSize: 1 },
+            scaleLabel: {
+              display: true,
+              labelString: 'Commits'
+            }
+          }
+        ]
+      },
+      legend: {
+        display: true,
+        position: "bottom"
+      }
+    }
     var chart = {
       labels: [],
       data: [chartData],
-      series: ["Commits"],
-      class: "chart-line"
+      series: [config.path],
+      class: "chart-line",
+      options: options
     };
 
-    angular.forEach(data, function(count, day) {
+    angular.forEach(data, function (count, day) {
       chart.labels.push(day);
       chartData.push(count);
     });

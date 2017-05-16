@@ -54,26 +54,26 @@ function RegisterWidgets(dashboardProvider) {
   // register github template by extending the template object
   dashboardProvider
     .widget('githubHistory', angular.extend({
-      title: 'Github History',
-      description: 'Display the commit history of a GitHub project as chart',
+      title: 'GitHub History',
+      description: 'Displays the commit history of a GitHub project as chart',
       controller: 'GithubHistoryController',
       templateUrl: '{widgetsPath}/github/src/line-chart.html'
     }, commitWidgets))
     .widget('githubAuthor', angular.extend({
-      title: 'Github Author',
+      title: 'GitHub Author',
       description: 'Displays the commits per author as pie chart',
       controller: 'GithubAuthorController',
       templateUrl: '{widgetsPath}/github/src/pie-chart.html'
     }, commitWidgets))
     .widget('githubCommits', angular.extend({
-      title: 'Github Commits',
-      description: 'Displays the commits as list',
+      title: 'GitHub Commits',
+      description: 'Displays the commits of a GitHub project',
       controller: 'GithubCommitsController',
       templateUrl: '{widgetsPath}/github/src/commits.html'
     }, commitWidgets))
     .widget('githubIssues', angular.extend({
-      title: 'Github Issues',
-      description: 'Displays issues as list of a GitHub project',
+      title: 'GitHub Issues',
+      description: 'Displays the issues of a GitHub project',
       controller: 'GithubIssuesController',
       templateUrl: '{widgetsPath}/github/src/issues.html',
       resolve: {
@@ -85,8 +85,8 @@ function RegisterWidgets(dashboardProvider) {
       }
     }, widget))
     .widget('githubUserEvents', {
-      title: 'Github User Events',
-      description: 'Display events of a certain user.',
+      title: 'GitHub User Events',
+      description: 'Displays events of a certain user',
       category: 'GitHub',
       controller: 'GithubEventsController',
       controllerAs: 'vm',
@@ -104,8 +104,8 @@ function RegisterWidgets(dashboardProvider) {
       }
     })
     .widget('githubOrganisationEvents', {
-      title: 'Github Organisation Events',
-      description: 'Display events of a public organisation.',
+      title: 'GitHub Organisation Events',
+      description: 'Displays events of a public organisation',
       category: 'GitHub',
       controller: 'GithubEventsController',
       controllerAs: 'vm',
@@ -123,8 +123,8 @@ function RegisterWidgets(dashboardProvider) {
       }
     })
     .widget('githubRepoEvents', {
-      title: 'Github Repository Events',
-      description: 'Display events of a certain repository.',
+      title: 'GitHub Repository Events',
+      description: 'Displays events of a certain repository',
       category: 'GitHub',
       controller: 'GithubEventsController',
       controllerAs: 'vm',
