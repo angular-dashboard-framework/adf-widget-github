@@ -85,11 +85,12 @@ function RegisterWidgets(dashboardProvider) {
       controller: 'GithubIssuesController',
       templateUrl: '{widgetsPath}/github/src/issues.html',
       resolve: {
-        issues: function(github, config){
+        /* @ngInject */
+        issues: ["github", "config", function(github, config){
           if (config.path){
             return github.getIssues(config);
           }
-        }
+        }]
       }
     }, widget))
     .widget('githubUserEvents', {
@@ -157,7 +158,7 @@ $templateCache.put("{widgetsPath}/github/src/events.org.edit.html","<form role=f
 $templateCache.put("{widgetsPath}/github/src/events.org.html","<div><div ng-if=!config.org class=\"alert alert-info\">Please configure the widget</div><div ng-if=config.org><ul class=media-list><li class=media ng-repeat=\"event in vm.events\"><div class=media-left><a href={{event.userUrl}} target=_blank><img class=\"media-object img-thumbnail\" ng-src={{event.userImage}} style=\"width: 64px; height: 64px;\"></a></div><div class=media-body><h4 class=media-heading><a href={{event.userUrl}} target=_blank>{{event.actor.login}}</a> <span>{{event.messageAction | limitTo: 128}} <a href={{event.linkElementOne}}>{{event.messageElementOne}}</a></span> <span ng-if=event.messageElementTwo>at <a href={{event.linkElementTwo}}>{{event.messageElementTwo}}</a></span></h4><p ng-if=event.comments ng-repeat=\"comment in event.comments | limitTo:2\"><a ng-if=comment.link href={{comment.link}}>{{comment.id | limitTo: 7}}&nbsp;</a> <span>{{comment.message | limitTo: 128}}</span></p><small><a href={{event.userUrl}} target=_blank>{{event.actor.login}}</a>, {{event.created_at | date: \'yyyy-MM-dd HH:mm\'}}</small></div></li></ul></div></div>");
 $templateCache.put("{widgetsPath}/github/src/events.repo.edit.html","<form role=form><div class=form-group><label for=path>Github Repository Path</label> <input type=text class=form-control id=path ng-model=config.path placeholder=\"Enter Path (owner/reponame)\"></div><div class=form-group><label for=path>Access Token</label> <input type=text class=form-control id=path ng-model=config.accessToken></div></form>");
 $templateCache.put("{widgetsPath}/github/src/events.repo.html","<div><div ng-if=!config.path class=\"alert alert-info\">Please configure the widget</div><div ng-if=config.path><ul class=media-list><li class=media ng-repeat=\"event in vm.events\"><div class=media-left><a href={{event.userUrl}} target=_blank><img class=\"media-object img-thumbnail\" ng-src={{event.userImage}} style=\"width: 64px; height: 64px;\"></a></div><div class=media-body><h4 class=media-heading><a href={{event.userUrl}} target=_blank>{{event.actor.login}}</a> <span>{{event.messageAction | limitTo: 128}}<a href={{event.linkElementOne}}>{{event.messageElementOne}}</a></span> <span ng-if=event.messageElementTwo>at <a href={{event.linkElementTwo}}>{{event.messageElementTwo}}</a></span></h4><p ng-if=event.comments ng-repeat=\"comment in event.comments | limitTo:2\"><a ng-if=comment.link href={{comment.link}}>{{comment.id | limitTo: 7}}</a> <span>{{comment.message | limitTo: 128}}</span></p><small><a href={{event.userUrl}} target=_blank>{{event.actor.login}}</a>, {{event.created_at | date: \'yyyy-MM-dd HH:mm\'}}</small></div></li></ul></div></div>");
-$templateCache.put("{widgetsPath}/github/src/events.user.edit.html","<form role=form><div class=form-group><label for=path>User Name</label> <input type=text class=form-control id=path ng-model=config.user placeholder=\"Enter User (username)\"></div><div class=form-group><label for=path>Organisation</label> <input type=text class=form-control id=path ng-model=config.org placeholder=\"(Optional) Enter Organisation\"></div><div class=form-group><label for=path>Access Token</label> <input type=text class=form-control id=path ng-model=config.accessToken></div></form>");
+$templateCache.put("{widgetsPath}/github/src/events.user.edit.html","<form role=form><div class=form-group><label for=path>User Name</label> <input type=text class=form-control id=path ng-model=config.user placeholder=\"Enter User (username)\"></div><div class=form-group><label for=path>Organisation</label> <input type=text class=form-control id=path ng-model=config.org placeholder=\"(Optional) Enter Organisation\"></div><div class=form-group><label for=path>Access Token</label> <input type=text class=form-control id=path ng-model=config.accessToken ng-required=config.org></div></form>");
 $templateCache.put("{widgetsPath}/github/src/events.user.html","<div><div ng-if=!config.user class=\"alert alert-info\">Please configure the widget</div><div ng-if=config.user><ul class=media-list><li class=media ng-repeat=\"event in vm.events\"><div class=media-left><a href={{event.userUrl}} target=_blank><img class=\"media-object img-thumbnail\" ng-src={{event.userImage}} style=\"width: 64px; height: 64px;\"></a></div><div class=media-body><h4 class=media-heading><a href={{event.userUrl}} target=_blank>{{event.actor.login}}</a> <span>{{event.messageAction | limitTo: 128}}<a href={{event.linkElementOne}}>{{event.messageElementOne}}</a></span> <span ng-if=event.messageElementTwo>at <a href={{event.linkElementTwo}}>{{event.messageElementTwo}}</a></span></h4><p ng-if=event.comments ng-repeat=\"comment in event.comments | limitTo:2\"><a ng-if=comment.link href={{comment.link}}>{{comment.id | limitTo: 7}}</a> {{comment.message | limitTo: 128}}</p><small><a href={{event.userUrl}} target=_blank>{{event.actor.login}}</a>, {{event.created_at | date: \'yyyy-MM-dd HH:mm\'}}</small></div></li></ul></div></div>");
 $templateCache.put("{widgetsPath}/github/src/issues.html","<div><div ng-if=!config.path class=\"alert alert-info\">Please configure the widget</div><div ng-if=config.path><ul class=media-list><li class=media ng-repeat=\"issue in vm.issues\"><div class=media-left><a href={{issue.user.html_url}} target=_blank><img class=\"media-object img-thumbnail\" ng-src={{issue.user.avatar_url}} style=\"width: 64px; height: 64px;\"></a></div><div class=media-body><h4 class=media-heading><a href={{issue.html_url}} target=_blank>#{{issue.number}} {{issue.title}}</a></h4><p>{{issue.body | limitTo: 128}}</p><small><a href={{issue.user.html_url}} target=_blank>{{issue.user.login}}</a>, {{issue.created_at | date: \'yyyy-MM-dd HH:mm\'}}</small></div></li></ul></div></div>");
 $templateCache.put("{widgetsPath}/github/src/line-chart.html","<div><div class=\"alert alert-info\" ng-if=!vm.chart>Please insert a repository path in the widget configuration</div><div ng-if=vm.chart><canvas id=line class=\"chart chart-line\" chart-data=vm.chart.data chart-labels=vm.chart.labels chart-series=vm.chart.series chart-options=vm.chart.options></canvas></div></div>");
@@ -513,7 +514,8 @@ function GithubHistoryController($filter, config, commits) {
       legend: {
         display: true,
         position: "bottom"
-      }
+      },
+      responsive: true
     }
     var chart = {
       labels: [],
@@ -656,7 +658,8 @@ function GithubAuthorController(config, commits) {
       legend: {
         display: true,
         position: "bottom"
-      }
+      },
+      responsive: true
     }
 
     var chart = {
