@@ -76,8 +76,8 @@ function RegisterWidgets(dashboardProvider) {
       description: 'Displays the issues of a GitHub project',
       controller: 'GithubIssuesController',
       templateUrl: '{widgetsPath}/github/src/issues.html',
-      /* @ngInject */
       resolve: {
+        /* @ngInject */
         issues: function(github, config){
           if (config.path){
             return github.getIssues(config);
