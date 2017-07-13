@@ -64,6 +64,8 @@ function GithubService($q, $http, githubApiUrl) {
     .then(transformData);
   }
 
+  // transform data from promise to fit in view of repo, org and user events
+
   function transformData(data){
     for(var i = 0; i<data.length; i++){
 
@@ -79,19 +81,13 @@ function GithubService($q, $http, githubApiUrl) {
 
       if(eventType === "PullRequestEvent"){
 
-        var issueNumer = data[i].payload.number;
+        var issueNumber = data[i].payload.number;
         var actionStatus = data[i].payload.action;
 
-        if (actionStatus === "closed") {
-          data[i].messageAction = "closed pull request ";
-          data[i].messageElementOne = repoName + "#" + issueNumer;
-          data[i].linkElementOne = repoUrl + "/issues/" + issueNumer;
-        }
-        else if (actionStatus === "opened"){
-          data[i].messageAction = "opened pull request ";
-          data[i].messageElementOne = repoName + "#" + issueNumer;
-          data[i].linkElementOne = repoUrl + "/issues/" + issueNumer;
-        }
+        data[i].messageAction = actionStatus + " pull request ";
+        data[i].messageElementOne = repoName + "#" + issueNumber;
+        data[i].linkElementOne = repoUrl + "/issues/" + issueNumber;
+
         if(data[i].payload.pull_request){
           data[i].comments = bindSingleComment(data[i].payload.pull_request.title);
         }
@@ -139,12 +135,8 @@ function GithubService($q, $http, githubApiUrl) {
       else if (eventType === "IssuesEvent") {
         var actionStatus = data[i].payload.action;
 
-        if (actionStatus === "closed") {
-          data[i].messageAction = "closed issue ";
-        }
-        else if (actionStatus === "opened"){
-          data[i].messageAction = "opened issue ";
-        }
+        data[i].messageAction = actionStatus + " issue ";
+        
         var issueNumber = data[i].payload.issue.number;
 
         data[i].messageElementOne = repoName + "#" + issueNumber;
@@ -158,10 +150,15 @@ function GithubService($q, $http, githubApiUrl) {
         data[i].messageElementOne = repoName;
         data[i].linkElementOne = repoUrl;
       }
+      else if (eventType === "CreateEvent") {
+        data[i].messageAction = "created " + data[i].payload.ref_type + " " + data[i].payload.ref + " at ";
+        data[i].messageElementOne = repoName;
+        data[i].linkElementOne = repoUrl;
+      }
       else if (eventType === "ReleaseEvent") {
         var releaseName = data[i].payload.release.name;
 
-        data[i].messageAction = "released "
+        data[i].messageAction = "released ";
         data[i].messageElementOne = releaseName;
         data[i].linkElementOne = repoUrl + "/releases/tag/" + releaseName;
         data[i].messageElementTwo = repoName;
@@ -178,6 +175,80 @@ function GithubService($q, $http, githubApiUrl) {
           }
           data[i].comments = comments;
         }
+      }
+      else if (eventType === "ForkEvent") {
+        data[i].messageAction = "forked ";
+        data[i].messageElementOne = repoName;
+        data[i].linkElementOne = repoUrl;
+      }
+      else if (eventType === "CommitCommentEvent") {
+        var commitId = data[i].payload.comment.commit_id;
+        var commentId = data[i].payload.comment.id;
+
+        data[i].messageAction = "commented on commit ";
+        data[i].messageElementOne = "#" + commitId.substring(0,7);
+        data[i].linkElementOne = repoUrl + "/commit/" + commitId + "#commitcomment-" + commentId;
+
+        if(data[i].payload.comment){
+          data[i].comments = bindSingleComment(data[i].payload.comment.body);
+        }
+      }
+      else if (eventType === "GollumEvent") {
+        data[i].messageAction = "changed Wiki in ";
+
+        data[i].messageElementOne = repoName;
+        data[i].linkElementOne = repoUrl;
+
+        if (data[i].payload.pages){
+
+          var itLength = data[i].payload.pages.length;
+          var comments = [];
+
+          for (var j = 0; j < itLength; j++){
+            var page = data[i].payload.pages[j];
+            var sha = page.sha;
+            var object = {
+              "id": sha,
+              "link": repoUrl + "/wiki/Home",
+              "message": page.action + " page " + page.page_name
+            };
+            comments.push(object);
+          }
+          data[i].comments = comments;
+        }
+      }
+      else if (eventType === "MemberEvent") {
+        var memberName = data[i].payload.member.login;
+        data[i].messageAction = "added user ";
+        data[i].messageElementOne = memberName;
+        data[i].linkElementOne = "https://github.com/" + memberName;
+        data[i].messageElementTwo = repoName;
+        data[i].linkElementTwo = repoUrl;
+      }
+      else if (eventType === "PublicEvent") {
+        data[i].messageAction = "published ";
+        data[i].messageElementOne = repoName;
+        data[i].linkElementOne = repoUrl;
+      }
+      else if (eventType === "PullRequestReviewCommentEvent") {
+        var commentId = data[i].payload.comment.id;
+        var commentUrl = data[i].payload.comment.html_url;
+        var requestId = data[i].payload.pull_request.id;
+        var requestUrl = data[i].payload.pull_request.html_url;
+        data[i].messageAction = data[i].payload.action + " comment ";
+        data[i].messageElementOne = "#"+ commentId;
+        data[i].linkElementOne = commentUrl;
+        data[i].messageElementTwo = "PullRequest#" + requestId;
+        data[i].linkElementTwo = requestUrl;
+
+        if(data[i].payload.comment){
+          data[i].comments = bindSingleComment(data[i].payload.comment.body);
+        }
+      }
+      else if (eventType === "WatchEvent") {
+        data[i].messageAction = "starred ";
+        data[i].messageElementOne = repoName;
+        data[i].linkElementOne = repoUrl;
       }
     }
     return data;
