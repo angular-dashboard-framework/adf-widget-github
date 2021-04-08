@@ -187,8 +187,7 @@ function GithubService($q, $http, githubApiUrl) {
   }
 
   function createUrl(type, config) {
-    var url = githubApiUrl + 'repos/' + config.path + '/' + type;
-    return url;
+    return githubApiUrl + 'repos/' + config.path + '/' + type;
   }
 
   function createUrlUserEvents(type, config) {
