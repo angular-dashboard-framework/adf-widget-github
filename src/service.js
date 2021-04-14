@@ -42,30 +42,30 @@ function GithubService($q, $http, githubApiUrl) {
   // implementation
 
   function getIssues(config) {
-    return fetch(createUrl('issues', config));
+    return fetch(createUrl('issues', config), config);
   }
 
   function getCommits(config) {
-    return fetch(createUrl('commits', config));
+    return fetch(createUrl('commits', config), config);
   }
 
   function getUserEvents(config) {
-    return fetch(createUrlUserEvents('events', config))
-    .then(transformData);
+    return fetch(createUrlUserEvents('events', config), config)
+      .then(transformData);
   }
 
   function getOrgaEvents(config) {
-    return fetch(createUrlOrgaEvents('events', config))
-    .then(transformData);
+    return fetch(createUrlOrgaEvents('events', config), config)
+      .then(transformData);
   }
 
   function getRepoEvents(config) {
-    return fetch(createUrl('events', config))
-    .then(transformData);
+    return fetch(createUrl('events', config), config)
+      .then(transformData);
   }
 
-  function transformData(data){
-    for(var i = 0; i<data.length; i++){
+  function transformData(data) {
+    for (var i = 0; i < data.length; i++) {
 
       data[i].userImage = data[i].actor.avatar_url;
       data[i].userUrl = 'https://github.com/' + data[i].actor.login;
@@ -77,7 +77,7 @@ function GithubService($q, $http, githubApiUrl) {
 
       var eventType = data[i].type;
 
-      if(eventType === "PullRequestEvent"){
+      if (eventType === "PullRequestEvent") {
 
         var issueNumer = data[i].payload.number;
         var actionStatus = data[i].payload.action;
@@ -86,29 +86,27 @@ function GithubService($q, $http, githubApiUrl) {
           data[i].messageAction = "closed pull request ";
           data[i].messageElementOne = repoName + "#" + issueNumer;
           data[i].linkElementOne = repoUrl + "/issues/" + issueNumer;
-        }
-        else if (actionStatus === "opened"){
+        } else if (actionStatus === "opened") {
           data[i].messageAction = "opened pull request ";
           data[i].messageElementOne = repoName + "#" + issueNumer;
           data[i].linkElementOne = repoUrl + "/issues/" + issueNumer;
         }
-        if(data[i].payload.pull_request){
+        if (data[i].payload.pull_request) {
           data[i].comments = bindSingleComment(data[i].payload.pull_request.title);
         }
-      }
-      else if (eventType === "PushEvent") {
+      } else if (eventType === "PushEvent") {
         data[i].messageAction = "pushed to ";
         data[i].messageElementOne = (data[i].payload.ref).substring(11);
         data[i].linkElementOne = repoUrl + "/tree/" + data[i].messageElementOne;
         data[i].messageElementTwo = repoName;
         data[i].linkElementTwo = repoUrl;
 
-        if (data[i].payload.commits){
+        if (data[i].payload.commits) {
 
           var itLength = data[i].payload.commits.length;
           var comments = [];
 
-          for (var j = 0; j < itLength; j++){
+          for (var j = 0; j < itLength; j++) {
 
             var sha = data[i].payload.commits[j].sha;
             var object = {
@@ -120,8 +118,7 @@ function GithubService($q, $http, githubApiUrl) {
           }
           data[i].comments = comments;
         }
-      }
-      else if (eventType === "IssueCommentEvent") {
+      } else if (eventType === "IssueCommentEvent") {
 
         var issueNumber = data[i].payload.issue.number;
 
@@ -132,17 +129,15 @@ function GithubService($q, $http, githubApiUrl) {
         if (data[i].payload.issue.pull_request) {
           data[i].messageAction = "commented on pull request ";
         }
-        if(data[i].payload.comment){
+        if (data[i].payload.comment) {
           data[i].comments = bindSingleComment(data[i].payload.comment.body);
         }
-      }
-      else if (eventType === "IssuesEvent") {
+      } else if (eventType === "IssuesEvent") {
         var actionStatus = data[i].payload.action;
 
         if (actionStatus === "closed") {
           data[i].messageAction = "closed issue ";
-        }
-        else if (actionStatus === "opened"){
+        } else if (actionStatus === "opened") {
           data[i].messageAction = "opened issue ";
         }
         var issueNumber = data[i].payload.issue.number;
@@ -152,13 +147,11 @@ function GithubService($q, $http, githubApiUrl) {
         if (data[i].payload.issue.title) {
           data[i].comments = bindSingleComment(data[i].payload.issue.title);
         }
-      }
-      else if (eventType === "DeleteEvent") {
+      } else if (eventType === "DeleteEvent") {
         data[i].messageAction = "deleted " + data[i].payload.ref_type + " " + data[i].payload.ref + " at ";
         data[i].messageElementOne = repoName;
         data[i].linkElementOne = repoUrl;
-      }
-      else if (eventType === "ReleaseEvent") {
+      } else if (eventType === "ReleaseEvent") {
         var releaseName = data[i].payload.release.name;
 
         data[i].messageAction = "released "
@@ -167,10 +160,10 @@ function GithubService($q, $http, githubApiUrl) {
         data[i].messageElementTwo = repoName;
         data[i].linkElementTwo = repoUrl;
 
-        if (data[i].payload.release.assets){
+        if (data[i].payload.release.assets) {
           var itLength = data[i].payload.release.assets.length;
           var comments = [];
-          for (var j = 0; j < itLength; j++){
+          for (var j = 0; j < itLength; j++) {
             var object = {
               "message": data[i].payload.release.assets[j].name
             };
@@ -182,8 +175,9 @@ function GithubService($q, $http, githubApiUrl) {
     }
     return data;
   }
+
   // returns array containing str to be bound to data-file
-  function bindSingleComment(str){
+  function bindSingleComment(str) {
     var comments = [];
     var object = {
       "message": str
@@ -192,50 +186,47 @@ function GithubService($q, $http, githubApiUrl) {
     return comments;
   }
 
-  function createUrl(type, config){
-    var url = githubApiUrl + 'repos/' + config.path + '/' + type + '?callback=JSON_CALLBACK';
-    if (config.accessToken){
-      url += '&access_token=' + config.accessToken;
-    }
-    return url;
+  function createUrl(type, config) {
+    return githubApiUrl + 'repos/' + config.path + '/' + type;
   }
 
-  function createUrlUserEvents(type, config){
+  function createUrlUserEvents(type, config) {
     var url = githubApiUrl + 'users/' + config.user + '/' + type;
-    if(config.org){
+    if (config.org) {
       url += '/orgs/' + config.org;
     }
-    url += '?callback=JSON_CALLBACK';
-    if (config.accessToken){
-      url += '&access_token=' + config.accessToken;
-    }
     return url;
   }
 
-  function createUrlOrgaEvents(type, config){
-    var url = githubApiUrl + 'orgs/' + config.org + '/' + type + '?callback=JSON_CALLBACK';
-    if (config.accessToken){
-      url += '&access_token=' + config.accessToken;
-    }
+  function createUrlOrgaEvents(type, config) {
+    var url = githubApiUrl + 'orgs/' + config.org + '/' + type;
     return url;
   }
 
-  function fetch(url){
+  function fetch(url, config) {
     var deferred = $q.defer();
-    $http.jsonp(url)
-      .success(function(data) {
-        if (data && data.meta) {
-          var status = data.meta.status;
-          if (status < 300) {
-            deferred.resolve(data.data);
-          } else {
-            deferred.reject(data.data.message);
-          }
-        }
-      })
-      .error(function() {
-        deferred.reject();
-      });
+
+    var req = {
+      method: 'GET',
+      url: url,
+      headers: {
+        'Authorization': "token " + config.accessToken,
+      }
+    }
+
+    // these header are not allowed by the github api and need to be removed
+    if($http.defaults.headers.get) {
+      delete $http.defaults.headers.get['If-Modified-Since']
+      delete $http.defaults.headers.get['Cache-Control']
+      delete $http.defaults.headers.get['Pragma']
+    }
+
+    $http(req).success(function successCallback(data) {
+      deferred.resolve(data);
+    }).error(function errorCallback(response) {
+      deferred.reject();
+    });
+
     return deferred.promise;
   }
 }
